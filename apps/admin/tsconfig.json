@@ -1,0 +1,13 @@
+{
+  "extends": "@pirate-nation/config/tsconfig.next",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": ["node_modules"]
+}
+

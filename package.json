@@ -1,0 +1,11 @@
+{
+  "name": "pirate-nation",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@9.0.0",
+  "scripts": {
+    "dev": "pnpm -r --parallel --filter \"apps/*\" dev",
+    "build": "pnpm -r --filter \"apps/*\" build",
+    "lint": "pnpm -r lint"
+  }
+}
