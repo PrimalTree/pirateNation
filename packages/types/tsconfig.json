@@ -1,9 +1,8 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "extends": "@pirate-nation/config/tsconfig.base",
+  "extends": "../config/tsconfig/tsconfig.base.json",
   "compilerOptions": {
     "strict": true
   },
   "include": ["src/**/*", "env.d.ts"]
 }
-

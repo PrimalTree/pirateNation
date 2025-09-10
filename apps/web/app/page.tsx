@@ -1,3 +1,4 @@
+"use client";
 import { Button } from '@pn/ui';
 
 export default function Page() {

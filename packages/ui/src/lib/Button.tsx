@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 
 export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -14,4 +15,3 @@ export function Button({ className = '', variant = 'default', ...props }: Button
     <button className={[base, variants[variant], className].join(' ')} {...props} />
   );
 }
-

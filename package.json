@@ -4,8 +4,8 @@
   "type": "module",
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "pnpm -r --parallel --filter \"apps/*\" dev",
-    "build": "pnpm -r --filter \"apps/*\" build",
+    "dev": "pnpm -r --parallel -F ./apps/web -F ./apps/admin dev",
+    "build": "pnpm -r -F ./apps/web -F ./apps/admin build",
     "lint": "pnpm -r lint"
   }
 }
