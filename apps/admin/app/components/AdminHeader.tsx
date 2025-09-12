@@ -32,6 +32,7 @@ export function AdminHeader() {
           <Link href="/push" className="hover:text-ecu-gold">Push</Link>
           <Link href="/map-layers" className="hover:text-ecu-gold">Map Layers</Link>
           <Link href="/feature-flags" className="hover:text-ecu-gold">Feature Flags</Link>
+          <Link href="/live" className="hover:text-ecu-gold">Live</Link>
         </nav>
       </div>
       <div className="mx-auto max-w-6xl px-4 pb-3 text-xs text-white/80">
@@ -49,4 +50,3 @@ export function AdminHeader() {
     </header>
   );
 }
-

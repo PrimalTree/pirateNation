@@ -6,7 +6,7 @@ import { AdminHeader } from './components/AdminHeader';
 export const metadata = { title: 'Admin', description: 'Admin UI' };
 
 async function requireAdmin() {
-  const supabase = createSupabaseServer();
+  const supabase = await createSupabaseServer();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { allowed: false } as const;
   const { data: profile } = await supabase

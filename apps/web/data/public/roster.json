@@ -1,0 +1,8 @@
+{
+  "team": "East Carolina Pirates",
+  "season": 2025,
+  "players": [
+    { "id": "p-1", "name": "Sample Player", "position": "QB", "number": 7 }
+  ]
+}
+

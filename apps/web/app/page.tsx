@@ -153,13 +153,11 @@ export default function Page() {
         </div>
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
           <div className="mb-2 text-sm text-zinc-400">Quick Actions</div>
-          <ClientOnly>
-            <div className="grid grid-cols-2 gap-3">
-              <Link href="/polls" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Polls</Link>
-              <Link href="/sponsors" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Sponsors</Link>
-              <Link href="/feedback" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Feedback</Link>
-            </div>
-          </ClientOnly>
+          <div className="grid grid-cols-2 gap-3">
+            <Link href="/polls" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Polls</Link>
+            <Link href="/sponsors" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Sponsors</Link>
+            <Link href="/feedback" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Feedback</Link>
+          </div>
         </div>
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
           {(() => {

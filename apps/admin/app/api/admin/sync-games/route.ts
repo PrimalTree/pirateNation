@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { fetchEspnScoreboard, normalizeEspnScoreboard, hexToUuidLike } from '../../../../../services/fetcher/espn';
+import { fetchEspnScoreboard, normalizeEspnScoreboard, hexToUuidLike } from '../../../../../../services/fetcher/espn';
 
 export const dynamic = 'force-dynamic';
 
@@ -93,4 +93,3 @@ export async function POST(req: Request) {
 
   return NextResponse.json({ ok: true, upserts, updates, results });
 }
-

@@ -1,0 +1,13 @@
+{
+  "season": 2025,
+  "games": [
+    {
+      "id": "ecu-2025-01",
+      "name": "East Carolina vs Example U",
+      "when": "2025-09-01T23:00:00Z",
+      "venue": "Dowdy–Ficklen Stadium",
+      "broadcast": "ESPN+"
+    }
+  ]
+}
+
