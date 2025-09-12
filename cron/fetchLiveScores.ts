@@ -1,27 +1,31 @@
 #!/usr/bin/env node
 /**
- * Pirate Nation — Admin Poller (ESPN mock)
+ * Pirate Nation — Admin Poller (ESPN)
  * Polls a live endpoint once and fanouts updates to all clients via Supabase Realtime.
- * - Fetch: https://api.example.com/live (mock)
+ * - Fetch: ESPN Scoreboard API
  * - Cache: public.live_games (game_id, score_json, hash, updated_at)
  * - Interval: 30s
  *
  * Env vars required (use service role key server-side only):
  * - SUPABASE_URL
  * - SUPABASE_SERVICE_ROLE
- * - ADMIN_POLL_TOKEN (sent as Bearer when calling the upstream live endpoint)
  */
 
 /* eslint-disable no-console */
 import 'dotenv/config';
 import crypto from 'node:crypto';
 import process from 'node:process';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
+import { fetchEspnScoreboard, normalizeEspnScoreboard } from '../services/fetcher/espn.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE = process.env.SUPABASE_SERVICE_ROLE;
-const ADMIN_POLL_TOKEN = process.env.ADMIN_POLL_TOKEN;
-const LIVE_URL = process.env.LIVE_SOURCE_URL || 'https://api.example.com/live';
 const INTERVAL_MS = Number(process.env.LIVE_POLL_INTERVAL_MS || 30_000);
 
 if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
@@ -33,7 +37,7 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
   auth: { persistSession: false },
 });
 
-function stableStringify(value) {
+function stableStringify(value: any) {
   // Sort keys to get a stable hash for semantically-identical payloads
   const seen = new WeakSet();
   return JSON.stringify(value, function (key, val) {
@@ -46,44 +50,21 @@ function stableStringify(value) {
           .reduce((acc, k) => {
             acc[k] = val[k];
             return acc;
-          }, {});
+          }, {} as any);
       }
     }
     return val;
   });
 }
 
-function hashPayload(obj) {
+function hashPayload(obj: any) {
   return crypto.createHash('sha256').update(stableStringify(obj)).digest('hex');
 }
 
-async function fetchLive() {
-  const headers = ADMIN_POLL_TOKEN ? { Authorization: `Bearer ${ADMIN_POLL_TOKEN}` } : {};
-  const res = await fetch(LIVE_URL, { headers, cache: 'no-store' });
-  if (!res.ok) throw new Error(`Upstream live fetch failed: ${res.status}`);
-  return res.json();
-}
-
-function normalizeLive(json) {
-  // Accept either { games: [...] } or just [...]
-  const arr = Array.isArray(json) ? json : Array.isArray(json?.games) ? json.games : [];
-  // Expect each item to include a unique id (game_id) and a score payload
-  // Fallbacks are included to support generic feeds during MVP.
-  return arr
-    .map((g) => {
-      const gameId = String(g.id ?? g.game_id ?? '').trim();
-      if (!gameId) return null;
-      const when = g.when ?? g.date ?? g.start ?? null;
-      const score = g.score ?? g.score_json ?? g;
-      return { game_id: gameId, when, score_json: score };
-    })
-    .filter(Boolean);
-}
-
-async function syncToSupabase(items) {
+async function syncToSupabase(items: any[]) {
   if (items.length === 0) return { updated: 0 };
 
-  const ids = items.map((i) => i.game_id);
+  const ids = items.map((i) => i.provider_id);
   const { data: existing, error: selErr } = await supabase
     .from('live_games')
     .select('game_id, hash')
@@ -93,12 +74,12 @@ async function syncToSupabase(items) {
   const byId = new Map((existing || []).map((r) => [r.game_id, r.hash]));
   const upserts = items
     .map((i) => {
-      const hash = hashPayload(i.score_json);
-      const prev = byId.get(i.game_id);
+      const hash = hashPayload(i.settings);
+      const prev = byId.get(i.provider_id);
       if (prev && prev === hash) return null; // unchanged — no broadcast
       return {
-        game_id: i.game_id,
-        score_json: i.score_json,
+        game_id: i.provider_id,
+        score_json: i.settings,
         hash,
         updated_at: new Date().toISOString(),
       };
@@ -114,23 +95,35 @@ async function syncToSupabase(items) {
   return { updated: upserts.length };
 }
 
-async function runOnce() {
+async function updateHealthCheckFile() {
   try {
-    const json = await fetchLive();
-    const items = normalizeLive(json);
+    const healthCheckFile = path.join(__dirname, '../../cron/.last-poller-run');
+    await fs.writeFile(healthCheckFile, new Date().toISOString());
+  } catch (e: any) {
+    console.error(`[poller] failed to write health check file: ${e.message}`);
+  }
+}
+
+async function runOnce() {
+  console.log(`[poller] running at ${new Date().toISOString()}`);
+  try {
+    const json = await fetchEspnScoreboard();
+    const items = normalizeEspnScoreboard(json);
+    console.log(`[poller] received ${items.length} items from source`);
     const { updated } = await syncToSupabase(items);
     if (updated > 0) {
-      console.log(`[poller] synced ${updated} changes at ${new Date().toISOString()}`);
+      console.log(`[poller] synced ${updated} changes`);
     } else {
       console.log('[poller] no changes');
     }
-  } catch (e) {
+    await updateHealthCheckFile();
+  } catch (e: any) {
     console.error('[poller] error', e?.message || e);
   }
 }
 
 async function main() {
-  console.log(`[poller] starting. source=${LIVE_URL} interval=${INTERVAL_MS}ms`);
+  console.log(`[poller] starting. interval=${INTERVAL_MS}ms`);
   await runOnce();
   const id = setInterval(runOnce, INTERVAL_MS);
   const cleanup = () => {
@@ -142,7 +135,7 @@ async function main() {
 }
 
 // Only run if invoked directly
+console.log(`[poller] argv[1] = ${process.argv[1]}`);
 if (process.argv[1] && process.argv[1].includes('fetchLiveScores.js')) {
   main();
 }
-

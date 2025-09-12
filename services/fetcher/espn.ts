@@ -89,8 +89,14 @@ export function normalizeEspnEvent(evt: z.infer<typeof EspnEventSchema>): Normal
 }
 
 export function normalizeEspnScoreboard(json: unknown): NormalizedGame[] {
+  const ECU_TEAM_ID = '151';
   const parsed = EspnScoreboardSchema.parse(json);
-  return parsed.events.map((evt) => normalizeEspnEvent(evt));
+  return parsed.events
+    .filter((evt) => {
+      const teams = evt.competitions?.[0]?.competitors?.map((c) => c.team?.id);
+      return teams?.includes(ECU_TEAM_ID);
+    })
+    .map((evt) => normalizeEspnEvent(evt));
 }
 
 export async function fetchEspnScoreboard(url?: string): Promise<unknown> {
@@ -121,4 +127,72 @@ export async function fetchEspnScoreboard(url?: string): Promise<unknown> {
       ]
     };
   }
+}
+
+export const EspnTeamScheduleSchema = z.object({
+  events: z.array(z.object({
+    id: z.string(),
+    name: z.string(),
+    date: z.string(),
+    competitions: z.array(z.object({
+      venue: z.object({
+        fullName: z.string()
+      }),
+      broadcasts: z.array(z.object({
+        media: z.object({
+          shortName: z.string()
+        })
+      })).optional()
+    }))
+  }))
+});
+
+export async function fetchEspnTeamSchedule(teamId: string): Promise<unknown> {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/schedule`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`ESPN fetch failed: ${res.status}`);
+  return await res.json();
+}
+
+export function normalizeEspnTeamSchedule(json: unknown) {
+  const parsed = EspnTeamScheduleSchema.parse(json);
+  return parsed.events.map(event => ({
+    id: event.id,
+    name: event.name,
+    when: event.date,
+    venue: event.competitions[0].venue.fullName,
+    broadcast: event.competitions[0].broadcasts?.[0]?.media?.shortName ?? 'TBD'
+  }));
+}
+
+export const EspnTeamRosterSchema = z.object({
+  athletes: z.array(z.object({
+    items: z.array(z.object({
+      id: z.string(),
+      displayName: z.string(),
+      position: z.object({
+        abbreviation: z.string()
+      }),
+      jersey: z.string().optional()
+    }))
+  }))
+});
+
+export async function fetchEspnTeamRoster(teamId: string): Promise<unknown> {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/roster`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`ESPN fetch failed: ${res.status}`);
+  return await res.json();
+}
+
+export function normalizeEspnTeamRoster(json: unknown) {
+  const parsed = EspnTeamRosterSchema.parse(json);
+  return parsed.athletes.flatMap(athleteGroup =>
+    athleteGroup.items.map(player => ({
+      id: player.id,
+      name: player.displayName,
+      position: player.position.abbreviation,
+      number: player.jersey ? parseInt(player.jersey, 10) : null
+    }))
+  );
 }

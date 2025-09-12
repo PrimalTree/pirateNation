@@ -1,0 +1,9 @@
+
+> pirate-nation@ poller /app
+> node dist/cron/fetchLiveScores.js
+
+[poller] argv[1] = /app/dist/cron/fetchLiveScores.js
+[poller] starting. interval=30000ms
+[poller] running at 2025-09-12T20:26:12.438Z
+[poller] received 0 items from source
+[poller] no changes

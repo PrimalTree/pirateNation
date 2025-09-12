@@ -18,7 +18,7 @@ export default function AuthCallback() {
           }, 500);
         }
       });
-  }, []);
+  }, [supabase.auth]);
 
   return <div className="text-white/80">{status}</div>;
 }

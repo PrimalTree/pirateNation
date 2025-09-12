@@ -31,7 +31,7 @@ export default function ChatTab({ chatRoom, initialMessages }: { chatRoom: ChatR
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId]);
+  }, [roomId, supabase]);
 
   const content = useMemo(() => {
     if (!roomId) return <div className="text-white/70">No active chat room for this game.</div>;

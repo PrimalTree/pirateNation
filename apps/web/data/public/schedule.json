@@ -2,12 +2,88 @@
   "season": 2025,
   "games": [
     {
-      "id": "ecu-2025-01",
-      "name": "East Carolina vs Example U",
-      "when": "2025-09-01T23:00:00Z",
-      "venue": "Dowdy–Ficklen Stadium",
+      "id": "401754373",
+      "name": "East Carolina Pirates at NC State Wolfpack",
+      "when": "2025-08-28T23:00Z",
+      "venue": "Carter-Finley Stadium",
+      "broadcast": "ACC Network"
+    },
+    {
+      "id": "401762459",
+      "name": "Campbell Fighting Camels at East Carolina Pirates",
+      "when": "2025-09-06T22:00Z",
+      "venue": "Dowdy-Ficklen Stadium",
       "broadcast": "ESPN+"
+    },
+    {
+      "id": "401761604",
+      "name": "East Carolina Pirates at Coastal Carolina Chanticleers",
+      "when": "2025-09-13T23:30Z",
+      "venue": "Brooks Stadium (SC)",
+      "broadcast": "ESPN+"
+    },
+    {
+      "id": "401756898",
+      "name": "BYU Cougars at East Carolina Pirates",
+      "when": "2025-09-20T23:30Z",
+      "venue": "Dowdy-Ficklen Stadium",
+      "broadcast": "ESPN2"
+    },
+    {
+      "id": "401762471",
+      "name": "Army Black Knights at East Carolina Pirates",
+      "when": "2025-09-25T23:30Z",
+      "venue": "Dowdy-Ficklen Stadium",
+      "broadcast": "ESPN"
+    },
+    {
+      "id": "401762480",
+      "name": "East Carolina Pirates at Tulane Green Wave",
+      "when": "2025-10-09T04:00Z",
+      "venue": "Yulman Stadium",
+      "broadcast": "TBD"
+    },
+    {
+      "id": "401762486",
+      "name": "Tulsa Golden Hurricane at East Carolina Pirates",
+      "when": "2025-10-16T23:30Z",
+      "venue": "Dowdy-Ficklen Stadium",
+      "broadcast": "ESPN"
+    },
+    {
+      "id": "401762498",
+      "name": "East Carolina Pirates at Temple Owls",
+      "when": "2025-11-01T04:00Z",
+      "venue": "Lincoln Financial Field",
+      "broadcast": "TBD"
+    },
+    {
+      "id": "401762504",
+      "name": "Charlotte 49ers at East Carolina Pirates",
+      "when": "2025-11-08T05:00Z",
+      "venue": "Dowdy-Ficklen Stadium",
+      "broadcast": "TBD"
+    },
+    {
+      "id": "401762508",
+      "name": "Memphis Tigers at East Carolina Pirates",
+      "when": "2025-11-15T05:00Z",
+      "venue": "Dowdy-Ficklen Stadium",
+      "broadcast": "TBD"
+    },
+    {
+      "id": "401762513",
+      "name": "East Carolina Pirates at UTSA Roadrunners",
+      "when": "2025-11-22T05:00Z",
+      "venue": "Alamodome",
+      "broadcast": "TBD"
+    },
+    {
+      "id": "401762519",
+      "name": "East Carolina Pirates at Florida Atlantic Owls",
+      "when": "2025-11-29T05:00Z",
+      "venue": "Flagler Credit Union Stadium",
+      "broadcast": "TBD"
     }
   ]
 }
-

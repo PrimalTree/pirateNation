@@ -2,7 +2,605 @@
   "team": "East Carolina Pirates",
   "season": 2025,
   "players": [
-    { "id": "p-1", "name": "Sample Player", "position": "QB", "number": 7 }
+    {
+      "id": "4608789",
+      "name": "Panda Askew",
+      "position": "OL",
+      "number": 53
+    },
+    {
+      "id": "5305997",
+      "name": "Daniel Baker",
+      "position": "OT",
+      "number": 63
+    },
+    {
+      "id": "5261753",
+      "name": "Michael Beatty",
+      "position": "RB",
+      "number": 22
+    },
+    {
+      "id": "4877874",
+      "name": "Darius Bell",
+      "position": "OL",
+      "number": 55
+    },
+    {
+      "id": "5095852",
+      "name": "Josh Benton",
+      "position": "RB",
+      "number": 23
+    },
+    {
+      "id": "5160081",
+      "name": "Mason Brown",
+      "position": "TE",
+      "number": 45
+    },
+    {
+      "id": "5293910",
+      "name": "Zach Caulder",
+      "position": "OL",
+      "number": 60
+    },
+    {
+      "id": "5084705",
+      "name": "Trenton Cloud",
+      "position": "WR",
+      "number": 88
+    },
+    {
+      "id": "5196644",
+      "name": "Stephen Collier",
+      "position": "TE",
+      "number": 83
+    },
+    {
+      "id": "5041960",
+      "name": "Jayvontay Conner",
+      "position": "TE",
+      "number": 8
+    },
+    {
+      "id": "5226083",
+      "name": "Jason Dickerson",
+      "position": "WR",
+      "number": 13
+    },
+    {
+      "id": "5215310",
+      "name": "Chaston Ditta",
+      "position": "QB",
+      "number": 9
+    },
+    {
+      "id": "5079419",
+      "name": "TJ Engleman Jr.",
+      "position": "RB",
+      "number": 20
+    },
+    {
+      "id": "5226082",
+      "name": "DaMari Gantt",
+      "position": "RB",
+      "number": 26
+    },
+    {
+      "id": "4794107",
+      "name": "Marlon Gunn Jr.",
+      "position": "RB",
+      "number": 21
+    },
+    {
+      "id": "5095857",
+      "name": "Trey Hardison",
+      "position": "OL",
+      "number": 68
+    },
+    {
+      "id": "5293909",
+      "name": "Ian Hemilright",
+      "position": "OL",
+      "number": 57
+    },
+    {
+      "id": "5258470",
+      "name": "Cole Hodge",
+      "position": "QB",
+      "number": 7
+    },
+    {
+      "id": "5166911",
+      "name": "Connor Hodge",
+      "position": "WR",
+      "number": 84
+    },
+    {
+      "id": "4795295",
+      "name": "Katin Houser",
+      "position": "QB",
+      "number": 4
+    },
+    {
+      "id": "4923290",
+      "name": "Parker Jenkins",
+      "position": "RB",
+      "number": 5
+    },
+    {
+      "id": "4912864",
+      "name": "Raheim Jeter",
+      "position": "QB",
+      "number": 2
+    },
+    {
+      "id": "5226090",
+      "name": "Ty Johnson",
+      "position": "WR",
+      "number": 80
+    },
+    {
+      "id": "4869324",
+      "name": "Tyler Johnson",
+      "position": "WR",
+      "number": 13
+    },
+    {
+      "id": "4875149",
+      "name": "Karson Jones",
+      "position": "OL",
+      "number": 73
+    },
+    {
+      "id": "5293902",
+      "name": "DeJuan Lacy",
+      "position": "RB",
+      "number": 28
+    },
+    {
+      "id": "4870798",
+      "name": "Malik Leverett",
+      "position": "WR",
+      "number": 89
+    },
+    {
+      "id": "4683251",
+      "name": "Kyle Long",
+      "position": "OL",
+      "number": 75
+    },
+    {
+      "id": "5148837",
+      "name": "Dillon Lorick",
+      "position": "WR",
+      "number": 14
+    },
+    {
+      "id": "5199858",
+      "name": "Eddie Love Jr.",
+      "position": "RB",
+      "number": 25
+    },
+    {
+      "id": "4692826",
+      "name": "Payton Mangrum",
+      "position": "WR",
+      "number": 19
+    },
+    {
+      "id": "5088134",
+      "name": "Dru McClough",
+      "position": "OL",
+      "number": 54
+    },
+    {
+      "id": "5125334",
+      "name": "Jimarion McCrimon",
+      "position": "OL",
+      "number": 62
+    },
+    {
+      "id": "4941012",
+      "name": "London Montgomery",
+      "position": "RB",
+      "number": 7
+    },
+    {
+      "id": "5293915",
+      "name": "Kaleb Morrow",
+      "position": "TE",
+      "number": 86
+    },
+    {
+      "id": "5125152",
+      "name": "Marleo Neolien",
+      "position": "OL",
+      "number": 66
+    },
+    {
+      "id": "4430798",
+      "name": "Kyler Pearson",
+      "position": "WR",
+      "number": 24
+    },
+    {
+      "id": "4870951",
+      "name": "Jaquaize Pettaway",
+      "position": "WR",
+      "number": 12
+    },
+    {
+      "id": "5095864",
+      "name": "Emmanuel Poku",
+      "position": "OL",
+      "number": 69
+    },
+    {
+      "id": "5081157",
+      "name": "Gage Reale",
+      "position": "TE",
+      "number": 82
+    },
+    {
+      "id": "5293911",
+      "name": "Peyton Reeder",
+      "position": "OL",
+      "number": 67
+    },
+    {
+      "id": "5216835",
+      "name": "Cayman Reynolds",
+      "position": "TE",
+      "number": 87
+    },
+    {
+      "id": "5157260",
+      "name": "Sam Riddy Jr.",
+      "position": "OL",
+      "number": 79
+    },
+    {
+      "id": "5160086",
+      "name": "Desirrio Riles",
+      "position": "TE",
+      "number": 6
+    },
+    {
+      "id": "4604008",
+      "name": "Kelan Robinson",
+      "position": "WR",
+      "number": 3
+    },
+    {
+      "id": "5077368",
+      "name": "Jonathan Akins",
+      "position": "DB",
+      "number": 21
+    },
+    {
+      "id": "5095851",
+      "name": "Jackson Barker",
+      "position": "LB",
+      "number": 1
+    },
+    {
+      "id": "4870614",
+      "name": "Justin Benton",
+      "position": "DL",
+      "number": 99
+    },
+    {
+      "id": "5196371",
+      "name": "Torin Brazell",
+      "position": "DL",
+      "number": 98
+    },
+    {
+      "id": "4431510",
+      "name": "TyMir Brown",
+      "position": "DB",
+      "number": 24
+    },
+    {
+      "id": "5095853",
+      "name": "Preston Carr",
+      "position": "DL",
+      "number": 44
+    },
+    {
+      "id": "5160076",
+      "name": "Adam Cole",
+      "position": "DB",
+      "number": 37
+    },
+    {
+      "id": "4683217",
+      "name": "Ryheem Craig",
+      "position": "LB",
+      "number": 5
+    },
+    {
+      "id": "5293901",
+      "name": "Key Crowell",
+      "position": "DB",
+      "number": 14
+    },
+    {
+      "id": "4906210",
+      "name": "Samuel Dankah",
+      "position": "DL",
+      "number": 7
+    },
+    {
+      "id": "5078009",
+      "name": "Julien Davis",
+      "position": "LB",
+      "number": 42
+    },
+    {
+      "id": "5212656",
+      "name": "Kendric Davis",
+      "position": "LB",
+      "number": 47
+    },
+    {
+      "id": "5078217",
+      "name": "Kieran Davis",
+      "position": "DL",
+      "number": 35
+    },
+    {
+      "id": "5095838",
+      "name": "Kendrick DuJour",
+      "position": "DL",
+      "number": 40
+    },
+    {
+      "id": "4870687",
+      "name": "Ayden Duncanson",
+      "position": "DB",
+      "number": 35
+    },
+    {
+      "id": "5216501",
+      "name": "Josiah Dwyer",
+      "position": "DL",
+      "number": 90
+    },
+    {
+      "id": "5219170",
+      "name": "Miles Gaddy",
+      "position": "DB",
+      "number": 38
+    },
+    {
+      "id": "4696215",
+      "name": "Chance Graves",
+      "position": "DB",
+      "number": 12
+    },
+    {
+      "id": "5148791",
+      "name": "DeMarius Hines",
+      "position": "DB",
+      "number": 6
+    },
+    {
+      "id": "5219557",
+      "name": "Luke Holmes",
+      "position": "LB",
+      "number": 33
+    },
+    {
+      "id": "4573460",
+      "name": "Noah Holmes",
+      "position": "LB",
+      "number": 25
+    },
+    {
+      "id": "5156157",
+      "name": "Tavius Horne Jr.",
+      "position": "DB",
+      "number": 23
+    },
+    {
+      "id": "5215505",
+      "name": "Derrion Horsley",
+      "position": "DB",
+      "number": 31
+    },
+    {
+      "id": "4709662",
+      "name": "Jonathan Jean",
+      "position": "DB",
+      "number": 22
+    },
+    {
+      "id": "5160078",
+      "name": "DJ Johnson Jr.",
+      "position": "LB",
+      "number": 11
+    },
+    {
+      "id": "5216503",
+      "name": "Bernard Lackey Jr.",
+      "position": "DB",
+      "number": 37
+    },
+    {
+      "id": "4869657",
+      "name": "J.D. Lampley",
+      "position": "DL",
+      "number": 9
+    },
+    {
+      "id": "5226084",
+      "name": "Jurnee Lattimore",
+      "position": "DB",
+      "number": 45
+    },
+    {
+      "id": "5293906",
+      "name": "Landon Lewis",
+      "position": "LB",
+      "number": 48
+    },
+    {
+      "id": "5148836",
+      "name": "O'Marion Lewis",
+      "position": "DB",
+      "number": 27
+    },
+    {
+      "id": "4812379",
+      "name": "Jordy Lowery",
+      "position": "DB",
+      "number": 15
+    },
+    {
+      "id": "5261755",
+      "name": "Jacoby Martin",
+      "position": "DL",
+      "number": 97
+    },
+    {
+      "id": "4433861",
+      "name": "Xavier McIver",
+      "position": "DL",
+      "number": 52
+    },
+    {
+      "id": "5119661",
+      "name": "Kamaurri McKinley",
+      "position": "DB",
+      "number": 20
+    },
+    {
+      "id": "5149451",
+      "name": "Kevon Merrell",
+      "position": "DB",
+      "number": 4
+    },
+    {
+      "id": "5293904",
+      "name": "Jordan Miles",
+      "position": "LB",
+      "number": 43
+    },
+    {
+      "id": "5215550",
+      "name": "Dominick Moody",
+      "position": "DL",
+      "number": 55
+    },
+    {
+      "id": "5226091",
+      "name": "Alex Moye",
+      "position": "DB",
+      "number": 26
+    },
+    {
+      "id": "5226086",
+      "name": "Jayden Olden",
+      "position": "LB",
+      "number": 41
+    },
+    {
+      "id": "5226092",
+      "name": "Miles Parker",
+      "position": "DL",
+      "number": 83
+    },
+    {
+      "id": "5160075",
+      "name": "Timothy Patterson",
+      "position": "DB",
+      "number": 30
+    },
+    {
+      "id": "5082111",
+      "name": "Ladarian Paulk",
+      "position": "DB",
+      "number": 28
+    },
+    {
+      "id": "5293907",
+      "name": "Evan Powell",
+      "position": "DL",
+      "number": 51
+    },
+    {
+      "id": "5293905",
+      "name": "Reagan Printy",
+      "position": "LB",
+      "number": 46
+    },
+    {
+      "id": "5151977",
+      "name": "Rasheed Reason",
+      "position": "DB",
+      "number": 17
+    },
+    {
+      "id": "5158914",
+      "name": "Ja'Marley Riddle",
+      "position": "DB",
+      "number": 2
+    },
+    {
+      "id": "4611524",
+      "name": "Jasiyah Robinson",
+      "position": "DL",
+      "number": 8
+    },
+    {
+      "id": "5155819",
+      "name": "Rion Roseborough",
+      "position": "DL",
+      "number": 93
+    },
+    {
+      "id": "5213304",
+      "name": "Angelo Ross",
+      "position": "DB",
+      "number": 39
+    },
+    {
+      "id": "5082102",
+      "name": "Andrew Conrad",
+      "position": "PK",
+      "number": 95
+    },
+    {
+      "id": "4695272",
+      "name": "Ryan Leavy",
+      "position": "P",
+      "number": 37
+    },
+    {
+      "id": "4890204",
+      "name": "Nick Mazzie",
+      "position": "PK",
+      "number": 30
+    },
+    {
+      "id": "4879871",
+      "name": "Triston O'Brien",
+      "position": "LS",
+      "number": 85
+    },
+    {
+      "id": "5226085",
+      "name": "Tomas O'Halloran",
+      "position": "P",
+      "number": 48
+    },
+    {
+      "id": "5089443",
+      "name": "Noah Perez",
+      "position": "PK",
+      "number": 43
+    }
   ]
 }
-

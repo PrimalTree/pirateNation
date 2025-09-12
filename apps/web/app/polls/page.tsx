@@ -32,7 +32,7 @@ export default function PollsPage() {
       if (!cancelled) setPolls(data ?? []);
     })();
     return () => { cancelled = true; };
-  }, []);
+  }, [supabase]);
 
   async function submitVote(poll: Poll, choiceIndex: number) {
     const deviceId = getDeviceId();

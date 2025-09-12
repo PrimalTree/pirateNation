@@ -27,7 +27,7 @@ export default function FeedTab({ gameId, initialPlayers }: { gameId: string; in
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [gameId]);
+  }, [gameId, supabase]);
 
   return (
     <div className="space-y-3">

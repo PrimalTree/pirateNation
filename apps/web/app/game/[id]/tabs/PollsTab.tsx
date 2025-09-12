@@ -23,7 +23,7 @@ export default function PollsTab({ initialPolls }: { initialPolls: Poll[] }) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [supabase]);
 
   return (
     <div className="space-y-3">
