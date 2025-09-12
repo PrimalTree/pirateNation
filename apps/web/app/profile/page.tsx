@@ -12,7 +12,7 @@ export default function ProfilePage() {
       setEmail(data.user?.email ?? null);
       setLoading(false);
     });
-  }, []);
+  }, [supabase.auth]);
 
   async function signOut() {
     await supabase.auth.signOut();

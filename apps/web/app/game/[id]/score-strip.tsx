@@ -26,7 +26,7 @@ export default function LiveScoreStrip({ gameId, initialScore }: { gameId: strin
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [gameId]);
+  }, [gameId, supabase]);
 
   const teams = score?.teams ?? [];
   const home = teams.find((t) => (t.homeAway || '').toLowerCase() === 'home') || teams[1];
