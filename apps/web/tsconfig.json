@@ -19,6 +19,9 @@
     "jsx": "preserve",
     "types": ["node", "@pirate-nation/types/env"],
     "baseUrl": ".",
+    "paths": {
+      "@services/*": ["../../services/*"]
+    },
     "noEmit": true,
     "isolatedModules": true
   },

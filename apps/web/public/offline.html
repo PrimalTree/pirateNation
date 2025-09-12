@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Offline • Pirate Nation</title>
+    <meta name="theme-color" content="#0a0a0a" />
+    <style>
+      html, body { height: 100%; margin: 0; }
+      body { display: grid; place-items: center; background: #0a0a0a; color: #e5e7eb; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; }
+      .card { width: min(520px, 92vw); border: 1px solid #27272a; background: #111113; border-radius: 16px; padding: 20px; }
+      .title { font-size: 18px; font-weight: 600; margin: 0 0 8px; }
+      .muted { color: #a1a1aa; font-size: 14px; }
+      .row { display: flex; align-items: center; gap: 8px; }
+      .btn { margin-top: 14px; display: inline-block; padding: 8px 12px; border-radius: 999px; background: #fde047; color: #0a0a0a; font-weight: 600; text-decoration: none; }
+      .btn:active { transform: translateY(1px); }
+      .icon { width: 20px; height: 20px; }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="row">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 3l9 18H3L12 3z" fill="#fde047"/></svg>
+        <div class="title">You are offline</div>
+      </div>
+      <p class="muted">The app shell is available, but the network couldn’t be reached. Check your connection and try again.</p>
+      <a class="btn" href="/">Try Home</a>
+    </div>
+  </body>
+  </html>
+

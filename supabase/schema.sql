@@ -277,6 +277,37 @@ begin
   return new;
 end $$;
 
+-- Live games cache for Realtime fanout
+create table if not exists public.live_games (
+  game_id text primary key,
+  score_json jsonb not null,
+  hash text not null,
+  updated_at timestamptz not null default now()
+);
+
+-- RLS: public can read, only service role can write (via service key)
+alter table public.live_games enable row level security;
+
+drop policy if exists live_games_select_public on public.live_games;
+create policy live_games_select_public on public.live_games
+  for select using (true);
+
+drop policy if exists live_games_insert_service on public.live_games;
+create policy live_games_insert_service on public.live_games
+  for insert with check ((auth.jwt() ->> 'role') = 'service_role');
+
+drop policy if exists live_games_update_service on public.live_games;
+create policy live_games_update_service on public.live_games
+  for update using ((auth.jwt() ->> 'role') = 'service_role')
+  with check ((auth.jwt() ->> 'role') = 'service_role');
+
+-- Optional: include table in "supabase_realtime" publication
+do $$ begin
+  if exists (select 1 from pg_publication where pubname = 'supabase_realtime') then
+    execute 'alter publication supabase_realtime add table public.live_games';
+  end if;
+exception when duplicate_object then null; end $$;
+
 do $$ begin
   if not exists (
     select 1 from pg_trigger where tgname = 'set_profiles_updated_at'

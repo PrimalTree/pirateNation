@@ -1,25 +1,35 @@
-import { createSupabaseServer } from '../../lib/supabase-server';
+"use client";
+import { useState } from 'react';
 
-export default async function SponsorsPage() {
-  const supabase = createSupabaseServer();
-  const { data: sponsors } = await supabase.from('sponsors').select('id, name, website_url, logo_url').limit(20);
+export default function SponsorsPage() {
+  const sponsors = [
+    { name: 'Sup Dogs', perk: '10% off on game day', code: 'PIRATE10', url: '#' },
+    { name: 'Pirate Coffee Co.', perk: 'BOGO cold brew', code: 'PIRATEBREW', url: '#' },
+    { name: 'Downtown Deli', perk: 'Free chips with sandwich', code: 'PIRATECHIPS', url: '#' },
+    { name: 'Greenville Fitness', perk: '$5 day pass', code: 'PIRATEFIT', url: '#' }
+  ];
+  const [copied, setCopied] = useState<string | null>(null);
+  async function copy(code: string) {
+    try { await navigator.clipboard.writeText(code); setCopied(code); setTimeout(() => setCopied(null), 1500); } catch {}
+  }
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <h1 className="text-3xl font-bold">Sponsors</h1>
-      <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {sponsors?.map((s) => (
-          <li key={s.id} className="flex items-center gap-3 rounded border border-white/10 p-3">
-            <div className="h-8 w-8 rounded bg-white/10" aria-hidden />
-            <div className="flex-1">
-              <div className="font-medium">{s.name}</div>
-              {s.website_url && (
-                <a className="text-sm text-ecu-gold underline" href={s.website_url} target="_blank">Visit</a>
-              )}
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+        <div className="grid gap-3 md:grid-cols-2">
+          {sponsors.map((s) => (
+            <div key={s.name} className="rounded-xl border border-zinc-700 bg-zinc-800/60 p-3">
+              <div className="font-medium text-zinc-100">{s.name}</div>
+              <div className="text-xs text-zinc-400">{s.perk}</div>
+              <div className="mt-2 flex items-center gap-2">
+                <button onClick={() => copy(s.code)} className="rounded-lg border border-yellow-400/30 bg-yellow-400/10 px-2 py-1 text-xs text-yellow-200">Copy code</button>
+                <a href={s.url} className="text-xs text-zinc-300 underline">Details</a>
+                {copied === s.code && <span className="text-xs text-green-400">Copied!</span>}
+              </div>
             </div>
-          </li>
-        )) || <li className="text-white/70">No sponsors yet.</li>}
-      </ul>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
-

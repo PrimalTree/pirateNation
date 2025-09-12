@@ -16,7 +16,10 @@
     "@pn/ui": "workspace:*",
     "@pirate-nation/types": "workspace:*",
     "@supabase/supabase-js": "^2.45.4",
-    "@supabase/ssr": "^0.5.1"
+    "@supabase/ssr": "^0.5.1",
+    "framer-motion": "^11.0.0",
+    "lucide-react": "^0.460.0",
+    "zod": "^3.23.8"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.17",

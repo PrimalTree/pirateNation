@@ -6,6 +6,12 @@
   "scripts": {
     "dev": "pnpm -r --parallel -F ./apps/web -F ./apps/admin dev",
     "build": "pnpm -r -F ./apps/web -F ./apps/admin build",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "poller": "node ./cron/fetchLiveScores.js"
+  }
+  ,
+  "devDependencies": {
+    "@supabase/supabase-js": "^2.45.4",
+    "dotenv": "^16.4.5"
   }
 }
