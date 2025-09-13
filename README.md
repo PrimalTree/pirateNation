@@ -1,7 +1,6 @@
-**Pirate Nation Monorepo**
+**Pirate Nation App**
 
-- PNPM workspaces with Next.js apps and shared packages.
-- Apps: `apps/web` (port 3000), `apps/admin` (port 3001).
+- Single Next.js app in `app/` with shared packages.
 - Packages: `packages/ui`, `packages/types`, `packages/config`.
 
 **MVP Features (Web App)**
@@ -18,14 +17,59 @@
 - Prereqs: Node 18+, PNPM 9
 - Install deps: `pnpm install`
 - Copy env: `.env.example` -> `.env` and fill values (see Environment)
-- Dev servers: `pnpm dev` (web on 3000, admin on 3001)
+- Dev server: `pnpm dev` (port 3000)
 - Open: http://localhost:3000
+
+## Unified App Structure (in progress)
+
+We are migrating to a single Vercel project with route groups:
+
+- `app/(public)` — Homepage + fan UI (keeps public URLs like `/`, `/game/[id]`, etc.)
+- `app/admin` — Admin UI (gated)
+- `app/api` — Combined API routes (cron, public JSON, admin endpoints)
+- `public/` — Static assets
+- `shared/` — Common logic (`supabase-browser`, `supabase-server`, etc.)
+
+Run the unified app locally (experimental):
+
+- `pnpm dev:app` — start the single app at port 3000
+- `pnpm build:app && pnpm start:app` — production build/start
+
+Notes:
+
+- Monorepo legacy apps have been removed.
+- `app/(public)/lib/*` and `app/admin/lib/*` re-export from `shared/*` to minimize import changes.
+
+### Local Mock Scores Poller (30s cadence)
+
+Use the included mock data to exercise the Supabase live cache without any external APIs.
+
+1) Env: copy `.env.local.example` to `.env` at repo root and fill:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE` (service role key; server-side only)
+   - Optionally tweak `LIVE_POLL_INTERVAL_MS`.
+2) Start web (serves mock JSON): `pnpm dev` (http://localhost:3000)
+   - Mock source: `GET /mock/scores.json` → `public/mock/scores.json`
+3) In another terminal: `pnpm run mock:poller:local`
+   - Poller logs either `synced N item(s)` or `no changes` every ~30s.
+4) Verify in Supabase: rows appear/update in `public.live_games` for `demo-1`, `demo-2`.
+5) Modify `public/mock/scores.json` (e.g., change a score) → poller should detect and upsert changes on the next tick.
+
+Notes:
+- The poller uses a best-effort distributed lock via `public.locks` (created by `supabase/schema.sql`) to ensure only one instance runs at a time per environment.
+- Logs are structured (one JSON per line) for easy aggregation.
+
+### Stadium Map Edge Endpoint
+
+- `GET /api/stadium-map` returns `public/maps/stadium-map.json`.
+- Cache headers: `Cache-Control: public, max-age=60, s-maxage=600, stale-while-revalidate=86400`.
+- Test locally: open http://localhost:3000/api/stadium-map and inspect headers.
 
 ## Admin Setup
 
-Admin UI lives in `apps/admin` and is role‑gated. Use the magic‑link form in the admin header to sign in, then set your `profiles.role` to one of: `moderator`, `admin`, or `sponsor_admin`.
+Admin UI lives at `/admin` and is role‑gated. Use the magic‑link form in the admin header to sign in, then set your `profiles.role` to one of: `moderator`, `admin`, or `sponsor_admin`.
 
-- Start admin only: `pnpm --filter ./apps/admin dev` (http://localhost:3001)
+- Open Admin: http://localhost:3000/admin
 - Root env required:
   - `SUPABASE_URL`, `SUPABASE_ANON_KEY` (for SSR session)
   - Server‑side: `SUPABASE_SERVICE_ROLE`, `ADMIN_POLL_TOKEN` (optional), `LIVE_SOURCE_URL`, `CRON_SECRET`, `CRON_URL`
@@ -35,10 +79,10 @@ Admin UI lives in `apps/admin` and is role‑gated. Use the magic‑link form in
   - `/polls`, `/ugc-queue`, `/sponsors`, `/map-layers`, `/feature-flags`, `/push` (MVP stubs)
 
 **Environment**
-- apps/web (client + server):
+- Client + server:
   - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
   - `SUPABASE_URL` and `SUPABASE_ANON_KEY` (for server components/actions)
-- apps/admin (espn sync utility):
+- Admin utilities:
   - `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY`
 
 Additional env used by the hybrid system (root `.env.local`):
@@ -66,7 +110,7 @@ Where to get values
 
 **Seeding Games (Optional Demo)**
 - POST ESPN scoreboard payload to the admin sync route to upsert `games`:
-  - `POST /apps/admin/app/api/admin/sync-games` (when running admin locally)
+- `POST /api/admin/sync-games`
   - Or deploy admin and hit `/api/admin/sync-games`
   - Body: `{ "url": "https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard" }`
 
@@ -94,11 +138,11 @@ Dynamic API:
   - Cache First for static assets (`/_next/static/**`, icons, manifest, fonts)
   - Network First for navigations with fallback to `/offline.html`
 - Icons:
-  - SVG any/maskable/monochrome in `apps/web/public/icons/`
-  - PNG fallbacks referenced in manifest; generate from SVGs (see `apps/web/public/icons/GENERATE.md`)
+  - SVG any/maskable/monochrome in `public/icons/`
+  - PNG fallbacks referenced in manifest; generate from SVGs (see `public/icons/GENERATE.md`)
 
 **Testing**
-- Web dev: `pnpm --filter ./apps/web dev`
+- Web dev: `pnpm dev`
 - Game hub: navigate to `/game/<uuid>` for a seeded or existing game.
 - Realtime: with tables enabled in Supabase Realtime, updates should stream into Feed/Chat/Score.
 - Admin: visit `http://localhost:3001/live`, click “Trigger Poll” (requires `CRON_URL`/`CRON_SECRET`), confirm rows in `public.live_games` advance.
@@ -111,9 +155,9 @@ Dynamic API:
 
 **Build & Deploy**
 - Build: `pnpm build`
-- Start (web): `pnpm --filter ./apps/web start`
+- Start: `pnpm start`
 - Hosting: Vercel/Netlify/Node server all work (service worker lives in `/public`).
-- Set env vars in your host for apps/web and apps/admin as needed.
+- Set env vars in your host for the unified app as needed.
 
 ## Hybrid Data Distribution (MVP)
 
@@ -143,7 +187,7 @@ Run locally: `pnpm poller`
 ### Vercel Cron (optional)
 
 - `vercel.json` contains a cron entry calling `/api/cron/live` every minute (Vercel minimum granularity).
-- Route: `apps/web/app/api/cron/live/route.ts` (runtime: nodejs)
+- Route: `app/api/cron/live/route.ts` (runtime: nodejs)
   - Reads the same envs as the poller
   - Protected by query token `?token=${CRON_SECRET}`
 
@@ -160,16 +204,16 @@ If you need 30s or tighter cadence, run `cron/fetchLiveScores.js` on an external
 
 Public endpoints (Edge runtime):
 
-- `/api/public/schedule.json` → `apps/web/data/public/schedule.json`
-- `/api/public/roster.json` → `apps/web/data/public/roster.json`
-- `/api/public/map.json` → `apps/web/data/public/map.json`
+- `/api/public/schedule.json` → `data/public/schedule.json`
+- `/api/public/roster.json` → `data/public/roster.json`
+- `/api/public/map.json` → `data/public/map.json`
 
 All set `Cache‑Control: public, s-maxage=86400, stale-while-revalidate=3600`.
 
 ### Frontend Helpers
 
-- Realtime: `apps/web/lib/live.ts` → `fetchLiveInitial()`, `subscribeLive(cb)`
-- CDN: `apps/web/lib/cdn.ts` → `getSchedule()`, `getRoster()`, `getMapData()` (session‑cached)
+- Realtime: `app/(public)/lib/live.ts` → `fetchLiveInitial()`, `subscribeLive(cb)`
+- CDN: `app/(public)/lib/cdn.ts` → `getSchedule()`, `getRoster()`, `getMapData()` (session‑cached)
 
 ### Rollback Playbook
 
@@ -193,7 +237,7 @@ All set `Cache‑Control: public, s-maxage=86400, stale-while-revalidate=3600`.
 
 - Replace mock `LIVE_SOURCE_URL` with real ESPN/StatBroadcast connectors; refine `normalizeLive` per source.
 - Strengthen ECU filtering with team IDs (not just name tokens).
-- Populate `apps/web/data/public/*.json` from your CMS or a build step.
+- Populate `data/public/*.json` from your CMS or a build step.
 - Address Tailwind content pattern warning by scoping patterns (avoid matching all of `node_modules`).
 - (Optional) Fix ESLint hook‑deps warnings; ensure all dynamic text has stable SSR or is wrapped per‑node.
 - Add monitoring for poller success and last update deltas.
