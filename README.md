@@ -21,6 +21,31 @@
 - Dev servers: `pnpm dev` (web on 3000, admin on 3001)
 - Open: http://localhost:3000
 
+### Local Mock Scores Poller (30s cadence)
+
+Use the included mock data to exercise the Supabase live cache without any external APIs.
+
+1) Env: copy `.env.local.example` to `.env` at repo root and fill:
+   - `SUPABASE_URL`
+   - `SUPABASE_SERVICE_ROLE` (service role key; server-side only)
+   - Optionally tweak `LIVE_POLL_INTERVAL_MS`.
+2) Start web (serves mock JSON): `pnpm dev` (http://localhost:3000)
+   - Mock source: `GET /mock/scores.json` → `apps/web/public/mock/scores.json`
+3) In another terminal: `pnpm run mock:poller:local`
+   - Poller logs either `synced N item(s)` or `no changes` every ~30s.
+4) Verify in Supabase: rows appear/update in `public.live_games` for `demo-1`, `demo-2`.
+5) Modify `apps/web/public/mock/scores.json` (e.g., change a score) → poller should detect and upsert changes on the next tick.
+
+Notes:
+- The poller uses a best-effort distributed lock via `public.locks` (created by `supabase/schema.sql`) to ensure only one instance runs at a time per environment.
+- Logs are structured (one JSON per line) for easy aggregation.
+
+### Stadium Map Edge Endpoint
+
+- `GET /api/stadium-map` returns `apps/web/public/maps/stadium-map.json`.
+- Cache headers: `Cache-Control: public, max-age=60, s-maxage=600, stale-while-revalidate=86400`.
+- Test locally: open http://localhost:3000/api/stadium-map and inspect headers.
+
 ## Admin Setup
 
 Admin UI lives in `apps/admin` and is role‑gated. Use the magic‑link form in the admin header to sign in, then set your `profiles.role` to one of: `moderator`, `admin`, or `sponsor_admin`.

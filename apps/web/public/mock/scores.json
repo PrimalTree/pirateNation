@@ -1,0 +1,21 @@
+[
+  {
+    "id": "demo-1",
+    "when": "2025-09-13T12:00:00Z",
+    "score": {
+      "home": { "team": "Pirates", "points": 21 },
+      "away": { "team": "Corsairs", "points": 17 },
+      "quarter": 3
+    }
+  },
+  {
+    "id": "demo-2",
+    "date": "2025-09-20T19:30:00Z",
+    "score_json": {
+      "home": { "team": "Mariners", "points": 10 },
+      "away": { "team": "Buccaneers", "points": 10 },
+      "quarter": 2
+    }
+  }
+]
+

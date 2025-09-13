@@ -8,6 +8,8 @@
     "build": "pnpm update-data && pnpm -r -F ./apps/web -F ./apps/admin build",
     "lint": "pnpm -r lint",
     "poller": "node dist/cron/fetchLiveScores.js",
+    "poller:mock": "node dist/cron/mockScorePoller.js",
+    "mock:poller:local": "pnpm compile-cron && node dist/cron/mockScorePoller.js",
     "update-data": "tsc -p tsconfig.cron.json && node dist/cron/updateData.js",
     "compile-cron": "tsc -p tsconfig.cron.json"
   },
