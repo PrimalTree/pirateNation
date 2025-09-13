@@ -154,9 +154,9 @@ export default function Page() {
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
           <div className="mb-2 text-sm text-zinc-400">Quick Actions</div>
           <div className="grid grid-cols-2 gap-3">
-            <Link href="/polls" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Polls</Link>
-            <Link href="/sponsors" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Sponsors</Link>
-            <Link href="/feedback" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Feedback</Link>
+            <a href="/polls" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Polls</a>
+            <a href="/sponsors" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Sponsors</a>
+            <a href="/feedback" className="inline-flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2 hover:bg-zinc-800">Feedback</a>
           </div>
         </div>
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
@@ -222,7 +222,16 @@ export default function Page() {
           <p className="text-sm text-zinc-400">Schedule coming soon.</p>
         ) : (
           <ul className="divide-y divide-zinc-800">
-            {schedule.slice(0, 10).map((g, i) => (
+            {schedule
+              .filter((g) => {
+                try {
+                  if (!g.when) return false;
+                  const d = new Date(g.when as string);
+                  return Number.isFinite(d.getTime()) && d.getUTCFullYear() === 2025;
+                } catch { return false; }
+              })
+              .slice(0, 10)
+              .map((g, i) => (
               <li key={i} className="flex items-center justify-between py-2 text-sm">
                 <span className="text-zinc-200">{g.name}</span>
                 <span className="text-zinc-400">{g.when ? new Date(g.when).toLocaleDateString() : 'TBD'}</span>

@@ -24,8 +24,21 @@ export async function GET() {
         return false;
       }
     });
-    cache = { data: onlyEcu, ts: now };
-    return NextResponse.json(onlyEcu);
+    const only2025 = onlyEcu
+      .filter((g) => {
+        try {
+          if (!g.when) return false;
+          const d = new Date(g.when as string);
+          return Number.isFinite(d.getTime()) && d.getUTCFullYear() === 2025;
+        } catch { return false; }
+      })
+      .sort((a, b) => {
+        const ta = a.when ? new Date(a.when as string).getTime() : 0;
+        const tb = b.when ? new Date(b.when as string).getTime() : 0;
+        return ta - tb;
+      });
+    cache = { data: only2025, ts: now };
+    return NextResponse.json(only2025);
   } catch (e) {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
   }
