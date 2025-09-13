@@ -4,8 +4,12 @@
   "type": "module",
   "packageManager": "pnpm@9.0.0",
   "scripts": {
-    "dev": "pnpm -r --parallel -F ./apps/web -F ./apps/admin dev",
-    "build": "pnpm update-data && pnpm -r -F ./apps/web -F ./apps/admin build",
+    "dev": "next dev -p 3000",
+    "dev:app": "next dev -p 3000",
+    "build": "pnpm update-data && next build",
+    "build:app": "next build",
+    "start": "next start -p 3000",
+    "start:app": "next start -p 3000",
     "lint": "pnpm -r lint",
     "poller": "node dist/cron/fetchLiveScores.js",
     "poller:mock": "node dist/cron/mockScorePoller.js",
@@ -14,6 +18,9 @@
     "compile-cron": "tsc -p tsconfig.cron.json"
   },
   "dependencies": {
+    "next": "15.5.2",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
     "@pirate-nation/fetcher": "workspace:*",
     "zod": "^3.23.8"
   },

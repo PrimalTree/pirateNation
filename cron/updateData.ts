@@ -29,8 +29,10 @@ async function main() {
       players: normalizedRoster,
     };
 
-    const schedulePath = path.join(__dirname, '../../apps/web/data/public/schedule.json');
-    const rosterPath = path.join(__dirname, '../../apps/web/data/public/roster.json');
+    const dataDir = path.join(__dirname, '../../data/public');
+    await fs.mkdir(dataDir, { recursive: true });
+    const schedulePath = path.join(dataDir, 'schedule.json');
+    const rosterPath = path.join(dataDir, 'roster.json');
 
     await fs.writeFile(schedulePath, JSON.stringify(schedule, null, 2));
     await fs.writeFile(rosterPath, JSON.stringify(roster, null, 2));

@@ -1,0 +1,20 @@
+{
+  "name": "Dowdy–Ficklen Stadium",
+  "version": 1,
+  "updated_at": "2025-01-01T00:00:00Z",
+  "sections": [
+    { "id": "A", "label": "Section A", "rows": 30, "entrances": ["E1"], "type": "home" },
+    { "id": "B", "label": "Section B", "rows": 28, "entrances": ["E1","E2"], "type": "home" },
+    { "id": "C", "label": "Section C", "rows": 32, "entrances": ["E2"], "type": "visitor" }
+  ],
+  "fields": {
+    "center": { "lat": 35.5987, "lng": -77.3649 },
+    "orientation": 90
+  },
+  "amenities": [
+    { "id": "R1", "type": "restroom", "near": "B" },
+    { "id": "C1", "type": "concessions", "near": "A" },
+    { "id": "M1", "type": "merch", "near": "C" }
+  ]
+}
+

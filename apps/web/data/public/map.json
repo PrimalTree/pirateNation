@@ -1,9 +1,0 @@
-{
-  "stadium": "Dowdy–Ficklen Stadium",
-  "version": 1,
-  "areas": [
-    { "id": "parking-a", "type": "parking", "name": "Lot A", "coords": [35.595, -77.365] },
-    { "id": "gate-1", "type": "gate", "name": "Gate 1", "coords": [35.596, -77.366] }
-  ]
-}
-
