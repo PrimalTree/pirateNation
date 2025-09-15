@@ -3,8 +3,6 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { PirateShip } from '../components/FlagVisuals';
 
-export const metadata = { title: 'No Quarter Flag' };
-
 export default function FlagPage() {
   return (
     <div className="fixed inset-0 z-40" style={{ backgroundColor: '#b91c1c' }}>

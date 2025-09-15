@@ -1,13 +1,11 @@
 "use client";
 import Link from 'next/link';
-import { useFlagOverlay } from './FlagOverlayContext';
-import { Flag as FlagIcon } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 export function TopBar() {
-  const { open } = useFlagOverlay();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -15,15 +13,17 @@ export function TopBar() {
       try {
         const supabase = createSupabaseBrowser();
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('user_id', user.id)
-          .maybeSingle();
-        const role = (profile?.role || 'user') as string;
-        const allowed = ['moderator', 'admin', 'sponsor_admin'];
-        if (alive) setIsAdmin(allowed.includes(role));
+        if (alive) setIsAuthed(!!user);
+        if (user) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('user_id', user.id)
+            .maybeSingle();
+          const role = (profile?.role || 'user') as string;
+          const allowed = ['moderator', 'admin', 'sponsor_admin'];
+          if (alive) setIsAdmin(allowed.includes(role));
+        }
       } catch {
         // ignore
       }
@@ -42,6 +42,17 @@ export function TopBar() {
           <Link href="/gameday" className="text-zinc-300 hover:text-white">Gameday</Link>
           <Link href="/engage" className="text-zinc-300 hover:text-white">Engage</Link>
           <Link href="/support" className="text-zinc-300 hover:text-white">Support</Link>
+          <Link href="/" className="text-zinc-300 hover:text-white">Start</Link>
+          <Link href="/sponsors" className="text-zinc-300 hover:text-white">Sponsors</Link>
+          <Link href="/feedback" className="text-zinc-300 hover:text-white">Feedback</Link>
+          {isAdmin && (
+            <Link href="/admin" className="text-zinc-300 hover:text-white">Admin</Link>
+          )}
+          {isAuthed ? (
+            <Link href="/profile" className="text-zinc-300 hover:text-white">Profile</Link>
+          ) : (
+            <Link href="/auth/signin" className="text-zinc-300 hover:text-white">Sign in</Link>
+          )}
         </nav>
       </div>
     </header>

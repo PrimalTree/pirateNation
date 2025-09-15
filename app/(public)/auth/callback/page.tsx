@@ -14,7 +14,7 @@ export default function AuthCallback() {
         } else {
           setStatus('Signed in! Redirecting...');
           setTimeout(() => {
-            window.location.replace('/profile');
+            window.location.replace('/app');
           }, 500);
         }
       });

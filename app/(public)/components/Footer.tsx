@@ -7,7 +7,7 @@ export function Footer() {
         <div>
           <div className="mb-2 font-semibold text-zinc-200">Explore</div>
           <ul className="space-y-1">
-            <li><Link href="/" className="hover:text-white">Home</Link></li>
+            <li><Link href="/app" className="hover:text-white">Home</Link></li>
             <li><Link href="/map" className="hover:text-white">Map</Link></li>
             <li><Link href="/polls" className="hover:text-white">Polls</Link></li>
             <li><Link href="/sponsors" className="hover:text-white">Sponsors</Link></li>
