@@ -32,7 +32,9 @@ export function Footer() {
           <ul className="space-y-1">
             <li><Link href="/legal/privacy" className="hover:text-white">Privacy</Link></li>
             <li><Link href="/legal/terms" className="hover:text-white">Terms</Link></li>
-            <li><Link href="/mockup" className="hover:text-white">UI Mockup</Link></li>
+            {process.env.NODE_ENV !== 'production' && (
+              <li><Link href="/mockup" className="hover:text-white">UI Mockup</Link></li>
+            )}
           </ul>
         </div>
       </div>

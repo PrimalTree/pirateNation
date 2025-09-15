@@ -17,40 +17,38 @@ export default function StartPage() {
         <h2 className="text-2xl font-semibold">Roadmap</h2>
         <div className="mt-3 grid gap-4 md:grid-cols-2">
           <div>
-            <div className="mb-1 font-medium text-zinc-200">Phase 1 — MVP (live)</div>
+            <div className="mb-1 font-medium text-zinc-200">Now</div>
             <ul className="list-disc space-y-1 pl-5 text-zinc-400">
-              <li>Raise Flag fullscreen experience</li>
-              <li>Static stadium map (token-configured)</li>
-              <li>Fan polls (Supabase)</li>
-              <li>Players list (basic profile)</li>
-              <li>Game page tabs (Feed, Polls, Chat, UGC, Map)</li>
+              <li>Raise the Flag on your phone during No Quarter</li>
+              <li>Stadium map at a glance</li>
+              <li>Fan polls you can vote in</li>
+              <li>Team roster with quick links</li>
+              <li>Live game hub with updates</li>
             </ul>
           </div>
           <div>
-            <div className="mb-1 font-medium text-zinc-200">Phase 2 — Engagement</div>
+            <div className="mb-1 font-medium text-zinc-200">Next</div>
             <ul className="list-disc space-y-1 pl-5 text-zinc-400">
-              <li>Live map overlays and routing</li>
-              <li>Richer player pages + NIL links</li>
-              <li>Notifications and reminders</li>
-              <li>Moderated chat with reactions</li>
-              <li>UGC submissions with templates</li>
+              <li>Better player pages and NIL info</li>
+              <li>Reminders for kickoff and big moments</li>
+              <li>Chat reactions and highlights</li>
+              <li>Share photos and stories from game day</li>
             </ul>
           </div>
           <div>
-            <div className="mb-1 font-medium text-zinc-200">Phase 3 — Partners</div>
+            <div className="mb-1 font-medium text-zinc-200">Later</div>
             <ul className="list-disc space-y-1 pl-5 text-zinc-400">
-              <li>Sponsor placements and promos</li>
-              <li>Ticketing and parking integrations</li>
-              <li>Official stats feeds</li>
-              <li>Expanded sports coverage</li>
+              <li>Sponsor perks and fan rewards</li>
+              <li>Ticket and parking info in one place</li>
+              <li>Richer stats and insights</li>
             </ul>
           </div>
           <div>
-            <div className="mb-1 font-medium text-zinc-200">Phase 4 — Polish</div>
+            <div className="mb-1 font-medium text-zinc-200">Future</div>
             <ul className="list-disc space-y-1 pl-5 text-zinc-400">
-              <li>Accessibility pass</li>
-              <li>Offline-friendly surfaces</li>
-              <li>Performance and caching sweeps</li>
+              <li>Support for more ECU sports</li>
+              <li>Faster loads and smoother offline use</li>
+              <li>Accessibility improvements across the app</li>
             </ul>
           </div>
         </div>
@@ -66,4 +64,3 @@ export default function StartPage() {
     </div>
   );
 }
-

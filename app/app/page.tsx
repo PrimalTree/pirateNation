@@ -37,6 +37,7 @@ export default function Page() {
   type Game = { name: string; when?: string; settings?: any };
   const [liveGames, setLiveGames] = useState<Game[]>([]);
   const [schedule, setSchedule] = useState<Game[]>([]);
+  const [nextGame, setNextGame] = useState<Game | null>(null);
   const [lastScoreUpdate, setLastScoreUpdate] = useState<number | null>(null);
   useEffect(() => {
     let mounted = true;
@@ -79,8 +80,11 @@ export default function Page() {
         .filter((g) => typeof g.when === 'string' && g.when)
         .map((g) => ({ g, ts: new Date(g.when as string).getTime() }))
         .filter(({ ts }) => Number.isFinite(ts) && ts > now)
-        .sort((a, b) => a.ts - b.ts)[0]?.g;
-      if (next?.when) setNextGameTime(new Date(next.when));
+        .sort((a, b) => a.ts - b.ts)[0]?.g as Game | undefined;
+      if (next?.when) {
+        setNextGameTime(new Date(next.when));
+        setNextGame(next);
+      }
     } catch {}
   }, [schedule]);
   function addKickoffToCalendar() {
@@ -159,6 +163,19 @@ export default function Page() {
           <div className="flex items-center justify-between">
             <h3 className="font-semibold">Kickoff Countdown</h3>
           </div>
+          <div className="mt-1 text-sm text-zinc-300">
+            {(() => {
+              try {
+                const teams: any[] | undefined = (nextGame as any)?.settings?.teams;
+                const vs = Array.isArray(teams)
+                  ? teams.map((t: any) => String(t?.name || '')).filter(Boolean).join(' vs ')
+                  : undefined;
+                return vs || (nextGame?.name ?? 'Upcoming Game');
+              } catch {
+                return nextGame?.name ?? 'Upcoming Game';
+              }
+            })()}
+          </div>
           <p className="mt-3 text-3xl font-mono tabular-nums text-yellow-200">{mounted ? timeLeft : '00:00:00'}</p>
           <p className="mt-1 text-xs text-zinc-400">Next game: {mounted ? nextGameTime.toLocaleString() : '-'}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-zinc-400">
@@ -209,4 +226,3 @@ export default function Page() {
     </div>
   );
 }
-
