@@ -1,0 +1,18 @@
+services:
+  - type: worker
+    name: pirate-poller
+    env: docker
+    dockerfilePath: Dockerfile.poller
+    plan: starter
+    autoDeploy: true
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE
+        sync: false
+      - key: LIVE_SOURCE_URL
+        sync: false
+      - key: ADMIN_POLL_TOKEN
+        sync: false
+      - key: LIVE_POLL_INTERVAL_MS
+        value: "30000"

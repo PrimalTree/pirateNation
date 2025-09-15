@@ -1,6 +1,6 @@
 import './globals.css';
 import React from 'react';
-import { createSupabaseServer } from '../lib/supabase-server';
+import { createSupabaseServer } from '@shared/supabase-server';
 import { AdminHeader } from './components/AdminHeader';
 
 export const metadata = { title: 'Admin', description: 'Admin UI' };

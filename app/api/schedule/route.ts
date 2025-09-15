@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { fetchEspnScoreboard, normalizeEspnScoreboard } from '@services/fetcher/espn';
+import { fetchEspnScoreboard, normalizeEspnScoreboard } from '@pirate-nation/fetcher';
 
 type CacheEntry<T> = { data: T; ts: number } | null;
 let cache: CacheEntry<ReturnType<typeof normalizeEspnScoreboard>> = null;

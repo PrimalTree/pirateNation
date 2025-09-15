@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { createSupabaseBrowser } from '../../../lib/supabase-browser';
+import { createSupabaseBrowser } from '@shared/supabase-browser';
 import { Trophy } from 'lucide-react';
 
 type ScoreTeam = { name?: string; score?: string | number; homeAway?: string };

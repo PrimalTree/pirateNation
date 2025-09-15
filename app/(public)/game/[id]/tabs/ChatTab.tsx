@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState } from 'react';
-import { createSupabaseBrowser } from '../../../../lib/supabase-browser';
+import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 type ChatRoom = { id: string; name?: string | null; is_active?: boolean } | null;
 type ChatMessage = { id: string; message: string; created_at?: string };

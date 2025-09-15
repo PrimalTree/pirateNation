@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    env:
+      NEXT_TELEMETRY_DISABLED: 1
+      NODE_OPTIONS: --max-old-space-size=4096
+      NEXT_PUBLIC_SITE_NAME: Pirate Nation
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      - name: Build
+        run: pnpm build
+
+      - name: Start server
+        run: |
+          pnpm start &
+          for i in {1..60}; do
+            if curl -sSf http://localhost:3000 > /dev/null; then
+              echo "Server is up"; break; fi; sleep 1; done
+
+      - name: Run smoke tests
+        env:
+          TEST_BASE_URL: http://localhost:3000
+        run: pnpm test
+

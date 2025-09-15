@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { createSupabaseBrowser } from '../../../../lib/supabase-browser';
+import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 type Poll = { id: string; question: string; options: any; allow_anonymous: boolean; is_active: boolean; created_at?: string };
 

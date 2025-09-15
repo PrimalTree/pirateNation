@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { createSupabaseBrowser } from '../../../../lib/supabase-browser';
+import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 type Player = { id: string; username?: string | null; created_at?: string };
 

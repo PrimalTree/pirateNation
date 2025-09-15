@@ -1,0 +1,43 @@
+# Dedicated poller worker container (Option C)
+# - Polls upstream every INTERVAL and upserts into Supabase
+# - Runs Node 20 LTS and compiles only the cron TS sources
+
+FROM node:20-alpine AS base
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Enable pnpm via corepack
+RUN corepack enable
+
+# Copy workspace manifests
+COPY package.json pnpm-lock.yaml tsconfig.cron.json ./
+
+# Copy only the code used by the poller
+COPY cron ./cron
+COPY services ./services
+COPY packages ./packages
+
+# Install and build cron scripts
+RUN pnpm install --frozen-lockfile && \
+    pnpm compile-cron
+
+# Final image
+FROM node:20-alpine
+ENV NODE_ENV=production
+WORKDIR /app
+
+# Only copy runtime artifacts to keep image small
+COPY --from=base /app/node_modules ./node_modules
+COPY --from=base /app/dist ./dist
+
+# Health file will be written inside container; ensure path exists
+RUN mkdir -p /app/cron
+
+# Required env (set at runtime):
+#  - SUPABASE_URL
+#  - SUPABASE_SERVICE_ROLE (or SUPABASE_SERVICE_ROLE_KEY)
+# Optional:
+#  - LIVE_SOURCE_URL, ADMIN_POLL_TOKEN, LIVE_POLL_INTERVAL_MS
+
+CMD ["node", "dist/cron/fetchLiveScores.js"]
+

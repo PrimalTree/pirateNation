@@ -2,6 +2,7 @@ import mapData from '../../../data/public/map.json';
 
 export default function MapPage() {
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+  
   // Derive a center from the first area (or fallback)
   const areas = Array.isArray((mapData as any)?.areas) ? (mapData as any).areas : [];
   const first = areas[0]?.coords as [number, number] | undefined; // [lat, lon]

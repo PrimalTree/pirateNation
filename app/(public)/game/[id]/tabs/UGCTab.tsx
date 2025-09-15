@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from 'react';
-import { createSupabaseBrowser } from '../../../../lib/supabase-browser';
+import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 type UGC = { id: string; title: string; content?: string | null; status: string; created_at?: string };
 

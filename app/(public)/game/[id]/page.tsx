@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { createSupabaseServer } from '../../../lib/supabase-server';
+import { createSupabaseServer } from '@shared/supabase-server';
 import { Tabs } from '@pn/ui';
 import LiveScoreStrip from './score-strip';
 import FeedTab from './tabs/FeedTab';

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { fetchEspnScoreboard, normalizeEspnScoreboard, hexToUuidLike } from '../../../../../../services/fetcher/espn';
+import { fetchEspnScoreboard, normalizeEspnScoreboard, hexToUuidLike } from '@pirate-nation/fetcher';
 
 export const dynamic = 'force-dynamic';
 

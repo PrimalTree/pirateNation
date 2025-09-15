@@ -186,12 +186,10 @@ Run locally: `pnpm poller`
 
 ### Vercel Cron (optional)
 
-- `vercel.json` contains a cron entry calling `/api/cron/live` every minute (Vercel minimum granularity).
-- Route: `app/api/cron/live/route.ts` (runtime: nodejs)
-  - Reads the same envs as the poller
-  - Protected by query token `?token=${CRON_SECRET}`
+- On Hobby, daily only. For live updates, prefer a dedicated poller worker.
+- Route: `app/api/cron/live/route.ts` (runtime: nodejs) remains available for manual/admin triggers.
 
-Set these envs in Vercel:
+Set these envs in Vercel if you keep the cron/manual trigger:
 
 - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE`
 - `ADMIN_POLL_TOKEN` (optional)
@@ -199,6 +197,15 @@ Set these envs in Vercel:
 - `CRON_SECRET` (required for the cron endpoint)
 
 If you need 30s or tighter cadence, run `cron/fetchLiveScores.js` on an external worker and remove the Vercel cron.
+
+### Dedicated Poller Worker (Option C)
+
+- Use `Dockerfile.poller` to build a tiny worker container and run it on your platform of choice (Fly/Render/Railway/K8s/VM).
+- Or see `docker-compose.poller.yml` for a one‑service compose.
+- Env required:
+  - `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE`
+  - Optional: `LIVE_SOURCE_URL`, `ADMIN_POLL_TOKEN`, `LIVE_POLL_INTERVAL_MS`
+- Docs: `docs/poller.md`.
 
 ### Edge‑cached Static Endpoints
 

@@ -1,0 +1,30 @@
+# Fly.io app configuration for the poller worker
+# Usage:
+#   fly launch --copy-config --now --dockerfile Dockerfile.poller
+
+app = "pirate-poller"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile.poller"
+
+[env]
+  LIVE_POLL_INTERVAL_MS = "30000"
+
+[[services]]
+  internal_port = 8080
+  protocol = "tcp"
+  autostart = true
+  auto_stop_machines = false
+  min_machines_running = 1
+  processes = ["app"]
+
+  [[services.sqlite]]
+    # placeholder to satisfy config parser if needed; poller does not listen
+
+[checks]
+  [checks.ping]
+    type = "tcp"
+    interval = "30s"
+    timeout = "2s"
+

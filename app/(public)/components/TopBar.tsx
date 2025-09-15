@@ -1,6 +1,35 @@
+"use client";
 import Link from 'next/link';
+import { useFlagOverlay } from './FlagOverlayContext';
+import { Flag as FlagIcon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 export function TopBar() {
+  const { open } = useFlagOverlay();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      try {
+        const supabase = createSupabaseBrowser();
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('user_id', user.id)
+          .maybeSingle();
+        const role = (profile?.role || 'user') as string;
+        const allowed = ['moderator', 'admin', 'sponsor_admin'];
+        if (alive) setIsAdmin(allowed.includes(role));
+      } catch {
+        // ignore
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
   return (
     <header className="sticky top-0 z-30 border-b border-zinc-800 bg-zinc-950/70 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
