@@ -1,6 +1,10 @@
 import Link from 'next/link';
 
 export function Footer() {
+  // Keep static to avoid hydration differences
+  const startYear = 2025;
+  const yearText = `${startYear}`;
+
   return (
     <footer className="border-t border-zinc-800 bg-zinc-950/70">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-6 text-sm text-zinc-300 md:grid-cols-4">
@@ -38,14 +42,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-zinc-800 py-4 text-center text-xs text-zinc-500">
-        {(() => {
-          const startYear = 2025;
-          const currentYear = new Date().getFullYear();
-          const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
-          return `© ${yearText} Primal Tree`;
-        })()}
-      </div>
+      <div className="border-t border-zinc-800 py-4 text-center text-xs text-zinc-500">© {yearText} Primal Tree</div>
     </footer>
   );
 }
