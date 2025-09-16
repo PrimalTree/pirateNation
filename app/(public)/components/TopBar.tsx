@@ -10,12 +10,9 @@ export function TopBar() {
           <span className="ml-2 rounded-full border border-yellow-400/30 bg-yellow-400/10 px-2 py-0.5 text-xs text-yellow-300">Beta</span>
         </div>
         <nav className="flex items-center gap-3 text-sm">
-          <Link href="/map" className="text-zinc-300 hover:text-white">Map</Link>
-          <Link href="/players" className="text-zinc-300 hover:text-white">Players</Link>
-          <Link href="/polls" className="text-zinc-300 hover:text-white">Polls</Link>
-          <Link href="/sponsors" className="text-zinc-300 hover:text-white">Sponsors</Link>
-          <Link href="/feedback" className="text-zinc-300 hover:text-white">Feedback</Link>
-          <Link href="/donate" className="text-zinc-300 hover:text-white">Donate</Link>
+          <Link href="/gameday" className="text-zinc-300 hover:text-white">Gameday</Link>
+          <Link href="/engage" className="text-zinc-300 hover:text-white">Engage</Link>
+          <Link href="/support" className="text-zinc-300 hover:text-white">Support</Link>
         </nav>
       </div>
     </header>
