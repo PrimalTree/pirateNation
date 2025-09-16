@@ -1,4 +1,4 @@
-import mapData from '../../data/public/map.json';
+import mapData from '../../../data/public/map.json';
 
 export default function MapPage() {
   const token = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
