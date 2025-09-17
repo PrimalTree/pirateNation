@@ -15,7 +15,7 @@ function getDeviceId() {
   }
 }
 
-export default function PollsPage() {
+function Polls() {
   const supabase = createSupabaseBrowser();
   const [polls, setPolls] = useState<Poll[]>([]);
   const [votes, setVotes] = useState<Record<string, number | null>>({});
@@ -45,7 +45,7 @@ export default function PollsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Fan Polls</h1>
+      <h2 className="text-2xl font-bold">Fan Polls</h2>
       {polls.length === 0 && <div className="text-zinc-400">No polls yet.</div>}
       {polls.map((p) => (
         <div key={p.id} className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
@@ -72,6 +72,28 @@ export default function PollsPage() {
           {!p.is_active && <div className="mt-2 text-xs text-zinc-500">Poll closed</div>}
         </div>
       ))}
+    </div>
+  );
+}
+
+export default function EngagePage() {
+  return (
+    <div className="space-y-8">
+      <h1 className="text-3xl font-bold">Engage</h1>
+
+      <section>
+        <h2 className="text-2xl font-bold">Video Feed</h2>
+        <p className="text-white/70">Coming soon!</p>
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold">Social Stream</h2>
+        <p className="text-white/70">Coming soon!</p>
+      </section>
+
+      <section>
+        <Polls />
+      </section>
     </div>
   );
 }

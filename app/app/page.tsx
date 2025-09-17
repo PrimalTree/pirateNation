@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Clock, HandCoins, Users } from 'lucide-react';
 import Link from 'next/link';
-import ClientOnly from '../(public)/components/ClientOnly';
+import ClientOnly from '../../components/ClientOnly';
 import { ScoreSummary } from '@shared/ui/ScoreSummary';
 
 function Glow() {
