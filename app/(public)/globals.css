@@ -6,3 +6,19 @@ html, body {
   height: 100%;
 }
 
+:root {
+  --brand-purple: #592A8A;
+  --brand-gold: #FDC82F;
+  --brand-lavender: #B388FF; /* electric lavender */
+}
+
+::selection {
+  background: var(--brand-lavender);
+  color: #0b0d10;
+}
+
+/* Prefer gold accents on hover for links */
+a:hover {
+  @apply text-ecu-gold;
+}
+

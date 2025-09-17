@@ -15,15 +15,19 @@ export const metadata = {
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <FlagOverlayProvider>
-      <TopBar />
-      <SponsorBanner />
-      <main className="mx-auto max-w-6xl p-6">{children}</main>
-      <Footer />
-      {/* Spacer so footer isn't hidden behind fixed BottomNav on small screens */}
-      <div className="h-20 md:hidden" aria-hidden />
-      <PWARegister />
-      <BottomNav />
-      <FlagOverlay />
+      <div>
+        <div suppressHydrationWarning>
+          <TopBar />
+        </div>
+        <SponsorBanner />
+        <main className="mx-auto max-w-6xl p-6">{children}</main>
+        <Footer />
+        {/* Spacer so footer isn't hidden behind fixed BottomNav on small screens */}
+        <div className="h-20 md:hidden" aria-hidden />
+        <PWARegister />
+        <BottomNav />
+        <FlagOverlay />
+      </div>
     </FlagOverlayProvider>
   );
 }

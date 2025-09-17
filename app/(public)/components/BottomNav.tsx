@@ -4,7 +4,7 @@ import { HandHeart, MessageSquare, Ticket } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 
-export function BottomNav() {
+export function BottomNav() {  
   const pathname = usePathname();
   const navRef = useRef<HTMLElement | null>(null);
 
@@ -42,7 +42,7 @@ export function BottomNav() {
         href={href}
         className={[
           'flex flex-1 flex-col items-center justify-center gap-1 py-2',
-          active ? 'text-yellow-300' : 'text-zinc-400 hover:text-zinc-200'
+          active ? 'text-ecu-gold' : 'text-zinc-400 hover:text-zinc-200'
         ].join(' ')}
       >
         <Icon className="h-5 w-5" />
@@ -52,7 +52,7 @@ export function BottomNav() {
   };
 
   return (
-    <nav ref={navRef} className="fixed inset-x-0 bottom-0 z-30 border-t border-zinc-800 bg-zinc-950/80 backdrop-blur md:hidden">
+    <nav ref={navRef} className="fixed inset-x-0 bottom-0 z-30 border-t border-ecu-purple/40 bg-black/80 backdrop-blur md:hidden">
       <div className="mx-auto grid max-w-6xl grid-cols-3 px-2">
         <Item href="/gameday" label="Gameday" Icon={Ticket} />
         <Item href="/engage" label="Engage" Icon={MessageSquare} />

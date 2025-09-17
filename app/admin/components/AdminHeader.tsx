@@ -1,20 +1,14 @@
 "use client";
 import Link from 'next/link';
-import { useState } from 'react';
 import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 export function AdminHeader() {
-  const [email, setEmail] = useState('');
   const supabase = createSupabaseBrowser();
 
-  async function sendMagicLink(e: React.FormEvent) {
-    e.preventDefault();
-    await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` }
-    });
-    alert('Check your email for a sign-in link.');
-    setEmail('');
+  async function signInWith(provider: 'google' | 'apple') {
+    const origin = typeof window !== 'undefined' ? window.location.origin : undefined;
+    const redirectTo = origin ? `${origin}/auth/callback` : undefined;
+    await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
   }
 
   return (
@@ -36,16 +30,10 @@ export function AdminHeader() {
         </nav>
       </div>
       <div className="mx-auto max-w-6xl px-4 pb-3 text-xs text-white/80">
-        <form onSubmit={sendMagicLink} className="flex items-center gap-2">
-          <input
-            type="email"
-            placeholder="admin@email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-64 rounded-md border border-white/10 bg-black px-3 py-1 text-white placeholder-white/40 focus:border-ecu-gold focus:outline-none"
-          />
-          <button className="rounded-md bg-ecu-purple px-3 py-1 text-white hover:opacity-90" type="submit">Magic Link</button>
-        </form>
+        <div className="flex items-center gap-2">
+          <button onClick={() => signInWith('google')} className="rounded-md bg-ecu-purple px-3 py-1 text-white hover:opacity-90">Sign in with Google</button>
+          <button onClick={() => signInWith('apple')} className="rounded-md bg-white px-3 py-1 text-black hover:opacity-90">Sign in with Apple</button>
+        </div>
       </div>
     </header>
   );

@@ -4,10 +4,6 @@ import React from 'react';
 export const metadata = {
   title: 'Pirate Nation Web',
   description: 'Web app stub',
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
-    { media: '(prefers-color-scheme: light)', color: '#fde047' },
-  ],
   icons: {
     icon: [
       { url: '/icons/icon-192.svg', sizes: '192x192', type: 'image/svg+xml' },
@@ -20,10 +16,17 @@ export const metadata = {
   appleWebApp: { capable: true, statusBarStyle: 'black-translucent' },
 };
 
+export const viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+    { media: '(prefers-color-scheme: light)', color: '#fde047' },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-zinc-950 text-zinc-100">{children}</body>
+      <body className="min-h-screen bg-black text-zinc-100">{children}</body>
     </html>
   );
 }

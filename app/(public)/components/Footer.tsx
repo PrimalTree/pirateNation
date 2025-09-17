@@ -6,7 +6,7 @@ export function Footer() {
   const yearText = `${startYear}`;
 
   return (
-    <footer className="border-t border-zinc-800 bg-zinc-950/70">
+    <footer className="border-t border-ecu-purple/40 bg-black/80">
       <div className="mx-auto grid max-w-6xl grid-cols-2 gap-6 px-4 py-6 text-sm text-zinc-300 md:grid-cols-4">
         <div>
           <div className="mb-2 font-semibold text-zinc-200">Explore</div>
@@ -42,7 +42,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-zinc-800 py-4 text-center text-xs text-zinc-500">© {yearText} Primal Tree</div>
+      <div className="border-t border-ecu-purple/40 py-4 text-center text-xs text-zinc-500">© {yearText} Primal Tree</div>
     </footer>
   );
 }

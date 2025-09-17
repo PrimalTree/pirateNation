@@ -13,6 +13,12 @@ const preset = {
           purple: '#592A8A',
           gold: '#FDC82F'
         },
+        brand: {
+          black: '#000000',
+          purple: '#592A8A',
+          gold: '#FDC82F',
+          lavender: '#B388FF'
+        },
         black: '#000000',
         white: '#ffffff'
       },
