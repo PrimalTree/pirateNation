@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Clock } from 'lucide-react';
 import Link from 'next/link';
-import ClientOnly from '../components/ClientOnly';
+import ClientOnly from '../../components/ClientOnly';
 
 function Glow() {
   return (

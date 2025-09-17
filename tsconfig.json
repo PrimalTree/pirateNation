@@ -24,6 +24,9 @@
       ],
       "@pirate-nation/types": [
         "packages/types/src/index.ts"
+      ],
+      "@pirate-nation/fetcher": [
+        "services/fetcher/espn.ts"
       ]
     },
     "allowJs": true,
