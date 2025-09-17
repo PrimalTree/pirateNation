@@ -1,12 +1,12 @@
 import '../(public)/globals.css';
 import React from 'react';
-import { TopBar } from '../(public)/components/TopBar';
-import { SponsorBanner } from '../(public)/components/SponsorBanner';
-import { BottomNav } from '../(public)/components/BottomNav';
-import { Footer } from '../(public)/components/Footer';
-import { PWARegister } from '../(public)/components/PWARegister';
-import { FlagOverlayProvider } from '../(public)/components/FlagOverlayContext';
-import { FlagOverlay } from '../(public)/components/FlagOverlay';
+import { TopBar } from '../../components/TopBar';
+import { SponsorBanner } from '../../components/support/SponsorBanner';
+import { BottomNav } from '../../components/BottomNav';
+import { Footer } from '../../components/Footer';
+import { PWARegister } from '../../components/PWARegister';
+import { FlagOverlayProvider } from '../../components/gameday/FlagOverlayContext';
+import { FlagOverlay } from '../../components/gameday/FlagOverlay';
 import { createSupabaseServer } from '@shared/supabase-server';
 import { redirect } from 'next/navigation';
 

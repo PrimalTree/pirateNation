@@ -1,11 +1,11 @@
 import React from 'react';
-import { TopBar } from './components/TopBar';
-import { SponsorBanner } from './components/SponsorBanner';
-import { BottomNav } from './components/BottomNav';
-import { Footer } from './components/Footer';
-import { PWARegister } from './components/PWARegister';
-import { FlagOverlayProvider } from './components/FlagOverlayContext';
-import { FlagOverlay } from './components/FlagOverlay';
+import { TopBar } from '../../components/TopBar';
+import { SponsorBanner } from '../../components/support/SponsorBanner';
+import { BottomNav } from '../../components/BottomNav';
+import { Footer } from '../../components/Footer';
+import { PWARegister } from '../../components/PWARegister';
+import { FlagOverlayProvider } from '../../components/gameday/FlagOverlayContext';
+import { FlagOverlay } from '../../components/gameday/FlagOverlay';
 
 export const metadata = {
   title: 'Pirate Nation Web',
