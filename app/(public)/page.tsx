@@ -1,2 +1,6 @@
-export { default } from './start/page';
+import { redirect } from 'next/navigation';
 
+export default function HomePage() {
+  redirect('/gameday');
+  return null;
+}
