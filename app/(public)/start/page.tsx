@@ -2,10 +2,10 @@ export default function StartPage() {
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-6">
-        <h1 className="text-3xl font-bold">Pirate Nation</h1>
+        <h1 className="text-3xl font-bold">Purple Armada</h1>
         <p className="mt-2 max-w-prose text-zinc-300">
-          Pirate Nation is a lightweight, fan-first web app for ECU Football.
-          It brings together game-day essentials: live scores, polls, chat, UGC,
+          Purple Armada is a lightweight, fan-first web app for ECU Football. Made by Pirates, for Pirates.
+          It brings together game-day essentials: live scores, polls, chat, User generated content,
           the stadium map, and the tradition of raising the Flag during No Quarter.
         </p>
         <p className="mt-2 max-w-prose text-zinc-400">
@@ -19,6 +19,7 @@ export default function StartPage() {
           <div>
             <div className="mb-1 font-medium text-zinc-200">Now</div>
             <ul className="list-disc space-y-1 pl-5 text-zinc-400">
+              <li>Kickoff Countdown</li>
               <li>Raise the Flag on your phone during No Quarter</li>
               <li>Stadium map at a glance</li>
               <li>Fan polls you can vote in</li>

@@ -20,9 +20,9 @@ export function PirateShip({ className = "" }: { className?: string }) {
   );
 }
 
-export function FlagCard() {
+export function FlagCard({ className = '' }: { className?: string }) {
   return (
-    <div className="relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+    <div className={["relative mx-auto aspect-[4/3] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900", className].join(' ')}>
       <motion.div
         className="absolute inset-0"
         animate={{ backgroundPositionX: [0, 30, 0] }}

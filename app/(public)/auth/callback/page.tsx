@@ -9,6 +9,16 @@ export default function AuthCallback() {
   useEffect(() => {
     (async () => {
       try {
+        const url = new URL(window.location.href);
+        const err = url.searchParams.get('error');
+        const errCode = url.searchParams.get('error_code');
+        const errDesc = url.searchParams.get('error_description');
+        if (err || errCode) {
+          const msg = errDesc?.replace(/\+/g, ' ') || (errCode || err) || 'Sign-in error';
+          setStatus(`Error: ${msg}`);
+          setTimeout(() => window.location.replace('/auth/signin'), 1200);
+          return;
+        }
         // Try to exchange code or hash for a session (works for both OAuth and magic links)
         const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
         if (error) throw error;

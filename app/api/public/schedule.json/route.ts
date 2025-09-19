@@ -1,12 +1,15 @@
-import schedule from '../../../../data/public/schedule.json';
+import fs from 'fs/promises';
+import path from 'path';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export async function GET() {
-  return new Response(JSON.stringify(schedule), {
+  const filePath = path.join(process.cwd(), 'data/public/schedule.json');
+  const buf = await fs.readFile(filePath, 'utf8');
+  return new Response(buf, {
     headers: {
       'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'public, s-maxage=86400, stale-while-revalidate=3600'
+      'cache-control': 'public, s-maxage=3600, stale-while-revalidate=3600'
     }
   });
 }

@@ -1,23 +1,11 @@
-"use server";
-
-export async function triggerLive(): Promise<{ ok: boolean; error?: string }> {
-  try {
-    const secret = process.env.CRON_SECRET || '';
-    if (!secret) return { ok: false, error: 'CRON_SECRET not set' };
-    const base = process.env.CRON_URL || 'http://localhost:3000/api/cron/fetchScores';
-    const url = new URL(base);
-    url.searchParams.set('secret', secret);
-    const res = await fetch(url.toString(), { method: 'POST', cache: 'no-store' });
-    if (!res.ok) return { ok: false, error: `HTTP ${res.status}` };
-    return { ok: true };
-  } catch (e: any) {
-    return { ok: false, error: e?.message || String(e) };
-  }
-}
-
+import { NextResponse } from 'next/server';
+import { fetchEspnTeamSchedule, normalizeEspnTeamSchedule, fetchEspnScoreboard, normalizeEspnScoreboard } from '../../../../services/fetcher/espn';
 import fs from 'fs/promises';
 import path from 'path';
-import { fetchEspnTeamSchedule, normalizeEspnTeamSchedule, fetchEspnScoreboard, normalizeEspnScoreboard } from '../../services/fetcher/espn';
+
+export const runtime = 'nodejs';
+
+const ECU_TEAM_ID = '151';
 
 async function enrichWithScores(games: any[]) {
   const byDate = new Map<string, any[]>();
@@ -77,17 +65,26 @@ async function enrichWithScores(games: any[]) {
   return out;
 }
 
-export async function updateSchedule(): Promise<{ ok: boolean; count?: number; error?: string }> {
+export async function POST(req: Request) {
+  const url = new URL(req.url);
+  const token = url.searchParams.get('token') || req.headers.get('authorization')?.replace(/^Bearer\s+/i, '');
+  const secret = process.env.CRON_SECRET || process.env.ADMIN_POLL_TOKEN || '';
+  if (!secret || token !== secret) {
+    return NextResponse.json({ error: 'unauthorized' }, { status: 401 });
+  }
   try {
-    const ECU_TEAM_ID = '151';
     const scheduleData = await fetchEspnTeamSchedule(ECU_TEAM_ID);
     const normalized = normalizeEspnTeamSchedule(scheduleData);
     const enriched = await enrichWithScores(normalized);
-    const out = { season: new Date().getFullYear(), games: enriched };
+    const out = {
+      season: new Date().getFullYear(),
+      games: enriched,
+    };
     const filePath = path.join(process.cwd(), 'data/public/schedule.json');
     await fs.writeFile(filePath, JSON.stringify(out, null, 2), 'utf8');
-    return { ok: true, count: enriched.length };
+    return NextResponse.json({ ok: true, count: enriched.length });
   } catch (e: any) {
-    return { ok: false, error: e?.message || 'failed' };
+    return NextResponse.json({ error: e?.message || 'failed' }, { status: 500 });
   }
 }
+

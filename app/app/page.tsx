@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useRef } from 'react';
 import { Clock, HandCoins, Users } from 'lucide-react';
 import Link from 'next/link';
 import ClientOnly from '../../components/ClientOnly';
@@ -39,8 +39,13 @@ export default function Page() {
   const [schedule, setSchedule] = useState<Game[]>([]);
   const [nextGame, setNextGame] = useState<Game | null>(null);
   const [lastScoreUpdate, setLastScoreUpdate] = useState<number | null>(null);
+  const mountedRef = useRef(true);
+  
+  // Fetch initial data and set up polling
   useEffect(() => {
-    let mounted = true;
+    mountedRef.current = true;
+    
+    // Initial fetch
     (async () => {
       try {
         const [scoreRes, schedRes] = await Promise.all([
@@ -49,28 +54,30 @@ export default function Page() {
         ]);
         const scores = await scoreRes.json();
         const sched = await schedRes.json();
-        if (mounted) {
+        if (mountedRef.current) {
           setLiveGames(Array.isArray(scores) ? scores : []);
           setSchedule(Array.isArray(sched) ? sched : []);
           setLastScoreUpdate(Date.now());
         }
       } catch {}
     })();
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  useEffect(() => {
-    const id = setInterval(async () => {
+    
+    // Poll for updates every 30 seconds
+    const interval = setInterval(async () => {
       try {
         const res = await fetch('/api/scoreboard', { cache: 'no-store' });
         const scores = await res.json();
-        setLiveGames(Array.isArray(scores) ? scores : []);
-        setLastScoreUpdate(Date.now());
+        if (mountedRef.current) {
+          setLiveGames(Array.isArray(scores) ? scores : []);
+          setLastScoreUpdate(Date.now());
+        }
       } catch {}
     }, 30000);
-    return () => clearInterval(id);
+    
+    return () => {
+      mountedRef.current = false;
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {

@@ -42,7 +42,14 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="border-t border-ecu-purple/40 py-4 text-center text-xs text-zinc-500">© {yearText} Primal Tree</div>
+      <div className="border-t border-ecu-purple/40 py-4 text-center">
+        <div className="text-xs text-zinc-500">© {yearText} Primal Tree</div>
+      </div>
     </footer>
   );
 }
+
+
+
+
+

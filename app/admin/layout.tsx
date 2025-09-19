@@ -14,7 +14,7 @@ async function requireAdmin() {
     .eq('user_id', user.id)
     .maybeSingle();
   const role = profile?.role ?? 'user';
-  const allowed = ['moderator', 'admin', 'sponsor_admin'].includes(role);
+  const allowed = ['admin'].includes(role);
   return { allowed, user, role } as const;
 }
 

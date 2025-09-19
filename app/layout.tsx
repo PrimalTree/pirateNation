@@ -2,7 +2,7 @@ import './(public)/globals.css';
 import React from 'react';
 
 export const metadata = {
-  title: 'Pirate Nation Web',
+  title: 'Purple Armada Web',
   description: 'Web app stub',
   icons: {
     icon: [
