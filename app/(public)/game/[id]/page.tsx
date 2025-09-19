@@ -108,12 +108,6 @@ export default async function GamePage({ params }: GameRouteParams) {
         ]}
       />
 
-      <Link
-        href="/donate"
-        className="fixed bottom-6 right-6 inline-flex items-center rounded-full bg-yellow-400 px-5 py-3 font-semibold text-zinc-900 shadow-lg hover:bg-yellow-300"
-      >
-        Donate
-      </Link>
     </div>
   );
 }
