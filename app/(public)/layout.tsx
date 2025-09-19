@@ -1,10 +1,10 @@
 import React from 'react';
-import { TopBar } from '../../components/TopBar';
-import { AnnouncementsBar } from '../../components/AnnouncementsBar';
-import { SponsorBanner } from '../../components/support/SponsorBanner';
-import { BottomNav } from '../../components/BottomNav';
-import { Footer } from '../../components/Footer';
-import { PWARegister } from '../../components/PWARegister';
+import { TopBar } from '@components/TopBar';
+import { AnnouncementsBar } from '@components/AnnouncementsBar';
+import { SponsorBanner } from '@components/support/SponsorBanner';
+import { BottomNav } from '@components/BottomNav';
+import { Footer } from '@components/Footer';
+import { PWARegister } from '@components/PWARegister';
 
 export const metadata = {
   title: 'Pirate Nation Web',
