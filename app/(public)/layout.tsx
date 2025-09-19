@@ -1,5 +1,5 @@
 import React from 'react';
-import TopBarClient from './TopBarClient';
+import { TopBar } from '../../components/TopBar';
 import { SponsorBanner } from '../../components/support/SponsorBanner';
 import { BottomNav } from '../../components/BottomNav';
 import { Footer } from '../../components/Footer';
@@ -15,7 +15,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
   return (
     <div>
       <div>
-        <TopBarClient />
+        <TopBar />
       </div>
       <SponsorBanner />
       <main className="mx-auto max-w-6xl p-6">{children}</main>
