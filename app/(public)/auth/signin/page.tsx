@@ -36,7 +36,7 @@ export default function SignInPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       setStatus('Signed in. Redirecting…');
-      setTimeout(() => window.location.replace('/app'), 600);
+      setTimeout(() => window.location.replace('/gameday'), 600);
     } catch (err: any) {
       setStatus(err?.message || 'Sign-in failed');
     }
@@ -102,7 +102,7 @@ export default function SignInPage() {
 
   useEffect(() => {
     if (!authed) return;
-    const id = setTimeout(() => { window.location.replace('/app'); }, 800);
+      const id = setTimeout(() => { window.location.replace('/gameday'); }, 800);
     return () => clearTimeout(id);
   }, [authed]);
 

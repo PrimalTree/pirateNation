@@ -16,6 +16,9 @@
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@components/*": [
+        "components/*"
+      ],
       "@shared/*": [
         "shared/*"
       ],

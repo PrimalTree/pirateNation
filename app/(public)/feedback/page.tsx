@@ -1,19 +1,22 @@
 "use client";
-import { useState } from 'react';
+import React, { Suspense, useState } from 'react';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 type Category = 'bug' | 'idea' | 'other';
 
-export default function FeedbackPage() {
+function FeedbackContent() {
+  const pathname = usePathname();
+  const search = useSearchParams();
   const [category, setCategory] = useState<Category>('bug');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [includeMeta, setIncludeMeta] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
 
-  function buildBody(path?: string) {
+  function buildBody() {
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const url = includeMeta && path ? path : '';
-    const meta = includeMeta ? `\n\n---\nUser agent: ${ua}${url ? `\nURL: ${url}` : ''}` : '';
+    const urlPath = includeMeta && pathname ? `${pathname}${search?.toString() ? `?${search!.toString()}` : ''}` : '';
+    const meta = includeMeta ? `\n\n---\nUser agent: ${ua}${urlPath ? `\nURL: ${urlPath}` : ''}` : '';
     return `[${category.toUpperCase()}]` + "\n\n" + message + meta;
   }
 
@@ -32,6 +35,7 @@ export default function FeedbackPage() {
     e.preventDefault();
     try {
       setStatus('Sending…');
+      const urlPath = includeMeta && pathname ? `${pathname}${search?.toString() ? `?${search!.toString()}` : ''}` : undefined;
       const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -39,7 +43,7 @@ export default function FeedbackPage() {
           category,
           email: email || undefined,
           message,
-          meta: includeMeta ? { userAgent: navigator.userAgent, url: location.href } : undefined,
+          meta: includeMeta ? { userAgent: navigator.userAgent, url: urlPath } : undefined,
         }),
       });
       if (!res.ok) throw new Error(await res.text().catch(() => 'Error'));
@@ -104,22 +108,20 @@ export default function FeedbackPage() {
         </label>
 
         <div className="flex flex-wrap gap-2 pt-1">
-          <button
-            type="submit"
-            className="rounded-xl bg-ecu-gold px-4 py-2 text-sm font-semibold text-black hover:opacity-90"
-          >
-            Submit
-          </button>
-          <a
-            href={mailto}
-            className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800"
-          >
-            Send via Email
-          </a>
+          <button type="submit" className="rounded-xl bg-ecu-gold px-4 py-2 text-sm font-semibold text-black hover:opacity-90">Submit</button>
+          <a href={mailto} className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800">Send via Email</a>
           <button type="button" onClick={onCopy} className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800">Copy Text</button>
         </div>
         {status && <div className="text-xs text-zinc-400">{status}</div>}
       </form>
     </div>
+  );
+}
+
+export default function FeedbackPage() {
+  return (
+    <Suspense fallback={<div className="mx-auto max-w-xl text-sm text-zinc-400">Loading…</div>}>
+      <FeedbackContent />
+    </Suspense>
   );
 }

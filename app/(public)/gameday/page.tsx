@@ -167,7 +167,6 @@ export default function Page() {
           <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold">Kickoff Countdown</h3>
-              <button onClick={addKickoffToCalendar} className="rounded-md border border-purple-400/30 bg-purple-500/10 px-2 py-1 text-xs text-purple-200 hover:bg-purple-500/20">Add to Calendar</button>
             </div>
             <div className="mt-2 grid grid-cols-4 gap-3 text-center">
               <div>
@@ -315,3 +314,4 @@ export default function Page() {
     </div>
   );
 }
+

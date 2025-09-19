@@ -1,5 +1,6 @@
 import React from 'react';
-import { TopBar } from '@components/TopBar';
+import { TopBar } from '../../components/TopBar';
+import { AnnouncementsBar } from '../../components/AnnouncementsBar';
 import { SponsorBanner } from '../../components/support/SponsorBanner';
 import { BottomNav } from '../../components/BottomNav';
 import { Footer } from '../../components/Footer';
@@ -17,6 +18,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <div>
         <TopBar />
       </div>
+      <AnnouncementsBar />
       <SponsorBanner />
       <main className="mx-auto max-w-6xl p-6">{children}</main>
       <Footer />

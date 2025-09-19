@@ -23,14 +23,14 @@ export default function AuthCallback() {
         const { error } = await supabase.auth.exchangeCodeForSession(window.location.href);
         if (error) throw error;
         setStatus('Signed in! Redirecting...');
-        setTimeout(() => window.location.replace('/app'), 500);
+        setTimeout(() => window.location.replace('/gameday'), 500);
         return;
       } catch (e: any) {
         // As a fallback for implicit flows where session is already in URL hash and stored
         const { data, error } = await supabase.auth.getSession();
         if (data.session && !error) {
           setStatus('Signed in! Redirecting...');
-          setTimeout(() => window.location.replace('/app'), 500);
+          setTimeout(() => window.location.replace('/gameday'), 500);
           return;
         }
         setStatus(`Error: ${e?.message || 'Sign-in failed'}`);
