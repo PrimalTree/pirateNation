@@ -10,10 +10,10 @@ export default function FeedbackPage() {
   const [includeMeta, setIncludeMeta] = useState(true);
   const [status, setStatus] = useState<string | null>(null);
 
-  function buildBody() {
+  function buildBody(path?: string) {
     const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-    const url = typeof window !== 'undefined' ? window.location.href : '';
-    const meta = includeMeta ? `\n\n---\nUser agent: ${ua}\nURL: ${url}` : '';
+    const url = includeMeta && path ? path : '';
+    const meta = includeMeta ? `\n\n---\nUser agent: ${ua}${url ? `\nURL: ${url}` : ''}` : '';
     return `[${category.toUpperCase()}]` + "\n\n" + message + meta;
   }
 
@@ -52,14 +52,8 @@ export default function FeedbackPage() {
     }
   };
 
-  const mailto = (() => {
-    const base = 'mailto:support@example.com?subject=' + encodeURIComponent('Pirate Nation Feedback');
-    try {
-      return base + '&body=' + encodeURIComponent(buildBody());
-    } catch {
-      return base;
-    }
-  })();
+  const mailtoBase = 'mailto:support@example.com?subject=' + encodeURIComponent('Pirate Nation Feedback');
+  const mailto = mailtoBase + '&body=' + encodeURIComponent(buildBody());
 
   return (
     <div className="mx-auto max-w-xl space-y-4">
@@ -122,13 +116,7 @@ export default function FeedbackPage() {
           >
             Send via Email
           </a>
-          <button
-            type="button"
-            onClick={onCopy}
-            className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800"
-          >
-            Copy Text
-          </button>
+          <button type="button" onClick={onCopy} className="rounded-xl border border-zinc-700 px-4 py-2 text-sm text-zinc-200 hover:bg-zinc-800">Copy Text</button>
         </div>
         {status && <div className="text-xs text-zinc-400">{status}</div>}
       </form>
