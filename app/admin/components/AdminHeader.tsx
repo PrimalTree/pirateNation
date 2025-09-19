@@ -29,6 +29,7 @@ export function AdminHeader() {
           <Link href="/admin/ugc-queue" className="hover:text-ecu-gold">UGC Queue</Link>
           <Link href="/admin/sponsors" className="hover:text-ecu-gold">Sponsors</Link>
           <Link href="/admin/push" className="hover:text-ecu-gold">Push</Link>
+          <Link href="/admin/donations" className="hover:text-ecu-gold">Donations</Link>
           <Link href="/admin/map-layers" className="hover:text-ecu-gold">Map Layers</Link>
           <Link href="/admin/feature-flags" className="hover:text-ecu-gold">Feature Flags</Link>
           <Link href="/admin/live" className="hover:text-ecu-gold">Live</Link>

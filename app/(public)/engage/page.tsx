@@ -2,6 +2,8 @@
 import Link from 'next/link';
 import ClientOnly from '../../components/ClientOnly';
 import { Button } from '../../../packages/ui/src/lib/Button';
+import { FanVote } from '../../../components/engage/FanVote';
+import { QuickPoll } from '../../../components/engage/QuickPoll';
 
 function Glow() {
   return (
@@ -33,25 +35,14 @@ export default function Page() {
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="font-semibold">Double Header</h3>
-          <Button>Fan Feed</Button>
+          <h3 className="font-semibold">Fan Vote: OMVP / DMVP</h3>
         </div>
-        <p className="text-sm text-zinc-400">Powered by: Primal Tree</p>
-        <ul className="mt-4 space-y-2 text-sm">
-          <li>ROLE: Fan-Foto MVP</li>
-          <li>PICK: Player</li>
-          <li>Campaigns Vs Cues</li>
-        </ul>
+        <FanVote />
       </section>
 
       <section>
-        <h3 className="mb-2 font-semibold">In The News (Latest)</h3>
-        <div className="flex space-x-4 overflow-x-auto pb-4">
-          <PlaceholderCard />
-          <PlaceholderCard />
-          <PlaceholderCard />
-          <PlaceholderCard />
-        </div>
+        <h3 className="mb-2 font-semibold">Quick Poll</h3>
+        <QuickPoll options={[{ key: 'pirates', label: 'Pirates' }, { key: 'opponent', label: 'Opponent' }]} />
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">

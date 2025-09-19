@@ -53,8 +53,10 @@ export function BottomNav() {
 
   return (
     <nav ref={navRef} className="fixed inset-x-0 bottom-0 z-30 border-t border-ecu-purple/40 bg-black/80 backdrop-blur md:hidden">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 px-2">
+      <div className="mx-auto grid max-w-6xl grid-cols-3 px-2">
         <Item href="/gameday" label="Gameday" Icon={Ticket} />
+        <Item href="/engage" label="Engage" Icon={MessageSquare} />
+        <Item href="/support" label="Support" Icon={HandHeart} />
       </div>
     </nav>
   );

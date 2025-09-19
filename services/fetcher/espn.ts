@@ -196,3 +196,71 @@ export function normalizeEspnTeamRoster(json: unknown) {
     }))
   );
 }
+
+// --- Team statistics (best-effort, structure can vary) ---
+export async function fetchEspnTeamStats(teamId: string, season?: number): Promise<unknown> {
+  const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/statistics${season ? `?season=${season}` : ''}`;
+  const res = await fetch(url, { cache: 'no-store' });
+  if (!res.ok) throw new Error(`ESPN team stats failed: ${res.status}`);
+  return await res.json();
+}
+
+export function normalizeEspnTeamStats(json: any) {
+  try {
+    const cats: any[] = Array.isArray(json?.statistics) ? json.statistics : [];
+    const flat: Record<string, any> = {};
+    for (const c of cats) {
+      const groupStats: any[] = Array.isArray(c?.stats) ? c.stats : [];
+      for (const s of groupStats) {
+        if (!s?.name) continue;
+        flat[s.name] = s.value ?? s.displayValue ?? null;
+      }
+    }
+    return {
+      pointsPerGame: Number(flat.pointsPerGame ?? flat.ppg ?? 0) || null,
+      totalYardsPerGame: Number(flat.totalYardsPerGame ?? flat.yardsPerGame ?? 0) || null,
+      rushingYardsPerGame: Number(flat.rushingYardsPerGame ?? 0) || null,
+      passingYardsPerGame: Number(flat.passingYardsPerGame ?? 0) || null,
+      thirdDownConversionPct: Number(flat.thirdDownConversionPct ?? flat.thirdDownConvPct ?? 0) || null,
+      turnovers: Number(flat.turnovers ?? 0) || null,
+    };
+  } catch {
+    return {};
+  }
+}
+
+// --- Team leaders (best-effort) ---
+export async function fetchEspnTeamLeaders(teamId: string, season?: number): Promise<unknown> {
+  // Known ESPN endpoints vary; try leaders endpoint, fallback to team endpoint with leaders enabled
+  const tryUrls = [
+    `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/leaders${season ? `?season=${season}` : ''}`,
+    `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}?enable=leaders${season ? `&season=${season}` : ''}`
+  ];
+  for (const url of tryUrls) {
+    try {
+      const res = await fetch(url, { cache: 'no-store' });
+      if (res.ok) return await res.json();
+    } catch {}
+  }
+  throw new Error('ESPN team leaders unavailable');
+}
+
+export function normalizeEspnTeamLeaders(json: any) {
+  // Produce a compact map of categories => { name, value }
+  const out: Record<string, { name: string; value: number | string }> = {};
+  try {
+    const source = json?.leaders || json?.team?.leaders || json; // try a few roots
+    const categories: any[] = Array.isArray(source?.leaders) ? source.leaders : Array.isArray(source) ? source : [];
+    for (const cat of categories) {
+      const key = String(cat?.name || cat?.displayName || '').toLowerCase();
+      const leaders: any[] = Array.isArray(cat?.leaders) ? cat.leaders : [];
+      const top = leaders[0];
+      if (!top) continue;
+      const athleteName = top?.athlete?.displayName || top?.athlete?.fullName || top?.displayName || '—';
+      const value = top?.value ?? top?.displayValue ?? null;
+      if (!key) continue;
+      out[key] = { name: String(athleteName), value: value as any };
+    }
+  } catch {}
+  return out;
+}
