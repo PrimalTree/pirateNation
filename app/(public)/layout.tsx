@@ -1,5 +1,5 @@
 import React from 'react';
-import { TopBar } from '../../components/TopBar';
+import { TopBar } from '@components/TopBar';
 import { SponsorBanner } from '../../components/support/SponsorBanner';
 import { BottomNav } from '../../components/BottomNav';
 import { Footer } from '../../components/Footer';
