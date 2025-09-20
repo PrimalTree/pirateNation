@@ -11,16 +11,15 @@ export function Footer() {
         <div>
           <div className="mb-2 font-semibold text-zinc-200">Explore</div>
           <ul className="space-y-1">
+          <li><Link href="/start" className="hover:text-white">Start</Link></li>
             <li><Link href="/gameday" className="hover:text-white">Home</Link></li>
-            <li><Link href="/map" className="hover:text-white">Map</Link></li>
-            <li><Link href="/polls" className="hover:text-white">Polls</Link></li>
-            <li><Link href="/sponsors" className="hover:text-white">Sponsors</Link></li>
+
           </ul>
         </div>
         <div>
           <div className="mb-2 font-semibold text-zinc-200">Community</div>
           <ul className="space-y-1">
-            <li><Link href="/players" className="hover:text-white">Players</Link></li>
+            <li><Link href="/engage" className="hover:text-white">Engage</Link></li>
             <li><Link href="/feedback" className="hover:text-white">Feedback</Link></li>
             <li><Link href="/profile" className="hover:text-white">Profile</Link></li>
           </ul>
@@ -37,9 +36,6 @@ export function Footer() {
           <ul className="space-y-1">
             <li><Link href="/legal/privacy" className="hover:text-white">Privacy</Link></li>
             <li><Link href="/legal/terms" className="hover:text-white">Terms</Link></li>
-            {process.env.NODE_ENV !== 'production' && (
-              <li><Link href="/mockup" className="hover:text-white">UI Mockup</Link></li>
-            )}
           </ul>
         </div>
       </div>

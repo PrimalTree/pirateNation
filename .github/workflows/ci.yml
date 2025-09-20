@@ -11,7 +11,7 @@ jobs:
     env:
       NEXT_TELEMETRY_DISABLED: 1
       NODE_OPTIONS: --max-old-space-size=4096
-      NEXT_PUBLIC_SITE_NAME: Pirate Nation
+      NEXT_PUBLIC_SITE_NAME: Purple Armada
     steps:
       - name: Checkout
         uses: actions/checkout@v4

@@ -1,16 +1,9 @@
 import { RawGame } from '../types';
 
-/**
- * Returns the week number for this date. dowOffset is the day of week the week
- * "starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
- * the week returned is the ISO 8601 week number.
- * @param int dowOffset
- * @return int
- */
 function getWeek(date: Date, dowOffset: number) {
-  dowOffset = typeof dowOffset == 'number' ? dowOffset : 0; //default dowOffset to zero
+  dowOffset = typeof dowOffset == 'number' ? dowOffset : 0;
   const newYear = new Date(date.getFullYear(), 0, 1);
-  let day = newYear.getDay() - dowOffset; //the day of week the year begins on
+  let day = newYear.getDay() - dowOffset;
   day = day >= 0 ? day : day + 7;
   const daynum =
     Math.floor(
@@ -20,14 +13,12 @@ function getWeek(date: Date, dowOffset: number) {
         86400000
     ) + 1;
   let weeknum;
-  //if the year starts before the middle of a week
   if (day < 4) {
     weeknum = Math.floor((daynum + day - 1) / 7) + 1;
     if (weeknum > 52) {
       const nYear = new Date(date.getFullYear() + 1, 0, 1);
       let nday = nYear.getDay() - dowOffset;
       nday = nday >= 0 ? nday : nday + 7;
-      /*if the next year starts before the middle of the week, it is week #1 of that year*/
       weeknum = nday < 4 ? 1 : 53;
     }
   } else {
@@ -36,8 +27,7 @@ function getWeek(date: Date, dowOffset: number) {
   return weeknum;
 }
 
-
-export function cfbdProvider(apiKey: string) {
+export function cfbdProvider(apiKey: string, weatherKey?: string) {
   const BASE_URL = 'https://api.collegefootballdata.com';
   const AUTH_HEADER = `Bearer ${apiKey}`;
 
@@ -47,27 +37,82 @@ export function cfbdProvider(apiKey: string) {
     url.searchParams.append('year', date.getFullYear().toString());
     url.searchParams.append('week', getWeek(date, 1).toString());
     url.searchParams.append('seasonType', 'regular');
-    if (team) {
-      url.searchParams.append('team', team);
-    }
+    if (team) url.searchParams.append('team', team);
 
     const response = await fetch(url.toString(), {
-      headers: {
-        Authorization: AUTH_HEADER,
-      },
+      headers: { Authorization: AUTH_HEADER },
     });
-
     if (!response.ok) {
-      throw new Error(`Failed to fetch games from CFBD API: ${response.statusText}`);
+      throw new Error(`CFBD error: ${response.statusText}`);
     }
-
     const games = (await response.json()) as RawGame[];
     return games.filter(
-      (game: RawGame) => new Date(game.start_date).toISOString().substring(0, 10) === dateISO.substring(0, 10)
+      (game: RawGame) =>
+        new Date(game.start_date).toISOString().substring(0, 10) === dateISO.substring(0, 10)
     );
+  }
+
+  async function getPregame(team: string) {
+    const year = new Date().getFullYear();
+    const url = new URL(`${BASE_URL}/games`);
+    url.searchParams.append('year', year.toString());
+    url.searchParams.append('seasonType', 'regular');
+    url.searchParams.append('team', team);
+
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: AUTH_HEADER },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error(`CFBD pregame error: ${res.status}`);
+    const games = await res.json();
+
+    const now = Date.now();
+    const upcoming = games.find((g: any) => new Date(g.start_date).getTime() >= now);
+    if (!upcoming) return null;
+
+    const opponent =
+      upcoming.away_team.toLowerCase() === team.toLowerCase()
+        ? upcoming.home_team
+        : upcoming.away_team;
+
+    // Weather: use venue city/state if present, otherwise default to Greenville
+    let weather: any = null;
+    if (weatherKey) {
+      const city = upcoming.venue || 'Greenville';
+      const q = encodeURIComponent(`${city},NC,US`);
+      try {
+        const wres = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?units=imperial&q=${q}&appid=${weatherKey}`,
+          { cache: 'no-store' }
+        );
+        if (wres.ok) {
+          const wjson = await wres.json();
+          weather = {
+            temp_f: wjson?.main?.temp ?? null,
+            description: wjson?.weather?.[0]?.description ?? null,
+            icon: wjson?.weather?.[0]?.icon ?? null,
+            wind_mph: wjson?.wind?.speed ?? null,
+            humidity: wjson?.main?.humidity ?? null,
+          };
+        }
+      } catch (e) {
+        console.error('Weather fetch failed:', e);
+      }
+    }
+
+    return {
+      opponent,
+      kickoff: upcoming.start_date,
+      venue: upcoming.venue || null,
+      broadcast: upcoming.tv || null,
+      status: upcoming.status || 'Scheduled',
+      weather,
+    };
   }
 
   return {
     getGamesByDate,
+    getPregame,
   };
 }
+
