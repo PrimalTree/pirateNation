@@ -37,20 +37,22 @@ export default function Page() {
         <div className="mb-2 flex items-center justify-between">
           <h3 className="font-semibold">Fan Vote: OMVP / DMVP</h3>
         </div>
-        <FanVote />
+        <h3>COMING SOON!</h3>
+        {/*<FanVote />*/}
       </section>
 
       <section>
         <h3 className="mb-2 font-semibold">Quick Poll</h3>
-        <QuickPoll options={[{ key: 'pirates', label: 'Pirates' }, { key: 'opponent', label: 'Opponent' }]} />
+        <h4> Choose the 3rd QTR SONG!</h4>
+        <QuickPoll options={[{ key: 'Keep Living on a Prayer', label: 'Keep Living on a Prayer' }, { key: 'Muse', label: 'Muse - Uprising' }, {key: 'RATM', label: 'RATM - Killing in the Name'}, { key: 'Wanted DOA', label: 'Bon Jovi - Wanted Dead or Alive' }, { key: 'Queen', label: 'Queen - We Will Rock You' } ]} />
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <h3 className="mb-2 font-semibold">Plunder (In-game score)</h3>
+        <h3 className="mb-2 font-semibold">Plunder COMING SOON</h3>
         <div className="h-48 rounded-lg bg-zinc-800"></div>
       </section>
 
-      <section>
+      {/*<section>
         <h3 className="mb-2 font-semibold">In The Socials</h3>
         <div className="flex space-x-4 overflow-x-auto pb-4">
           <PlaceholderCard />
@@ -58,7 +60,7 @@ export default function Page() {
           <PlaceholderCard />
           <PlaceholderCard />
         </div>
-      </section>
+      </section>*/}
     </div>
   );
 }

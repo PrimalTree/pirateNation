@@ -50,8 +50,11 @@ export default async function SupportPage() {
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
-        <DonationForm />
-        <p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via Stripe.</p>
+
+        <button onClick={() => window.location.href = 'https://ecupirateclub.com/'}> PIRATE CLUB</button>
+        <button onClick={() => window.location.href = 'https://teamboneyard.org/'}> TEAM BONEYARD</button>
+        {/* <DonationForm /> */}
+        {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
       </section>
     </div>
   );
