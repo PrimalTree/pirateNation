@@ -23,6 +23,15 @@ jobs:
           node-version: '20.11.1'
           cache: 'pnpm'
 
+      - name: Ensure pnpm is available
+        run: |
+            if ! command -v pnpm &> /dev/null; then
+              echo "Installing pnpm globally..."
+              npm install -g pnpm
+            else
+              echo "pnpm already installed"
+            fi
+  
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
