@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
 
 jobs:
@@ -12,28 +12,42 @@ jobs:
       NEXT_TELEMETRY_DISABLED: 1
       NODE_OPTIONS: --max-old-space-size=4096
       NEXT_PUBLIC_SITE_NAME: Purple Armada
+
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '20.11.1'
           cache: 'pnpm'
 
-      - name: Setup PNPM
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 9
 
+      - name: Verify pnpm is available
+        run: |
+          if ! command -v pnpm &> /dev/null; then
+            echo "pnpm not found, installing..."
+            npm install -g pnpm
+          else
+            echo "pnpm is already installed."
+          fi
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile=false
 
-      - name: Build
+      - name: Build project
         run: pnpm build
 
-      - name: Start server
+      - name: Kill any process on port 3000 (optional safety)
+        run: |
+          sudo lsof -t -i tcp:3000 | xargs -r kill -9 || echo "Port 3000 already free"
+
+      - name: Start server in background
         run: |
           pnpm start &
           for i in {1..60}; do
@@ -44,4 +58,3 @@ jobs:
         env:
           TEST_BASE_URL: http://localhost:3000
         run: pnpm test
-
