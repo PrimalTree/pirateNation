@@ -4,6 +4,7 @@ import ClientOnly from '../../components/ClientOnly';
 import { Button } from '../../../packages/ui/src/lib/Button';
 import { FanVote } from '../../../components/engage/FanVote';
 import { QuickPoll } from '../../../components/engage/QuickPoll';
+import { GamedayPics } from '../../../components/engage/GamedayPics';
 
 function Glow() {
   return (
@@ -44,6 +45,8 @@ export default function Page() {
         <h3 className="mb-2 font-semibold">Quick Poll</h3>
         <QuickPoll options={[{ key: 'pirates', label: 'Pirates' }, { key: 'opponent', label: 'Opponent' }]} />
       </section>
+
+      <GamedayPics />
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <h3 className="mb-2 font-semibold">Plunder (In-game score)</h3>
