@@ -24,7 +24,7 @@ export function Header() {
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 p-4">
         <Link href="/" className="flex items-center gap-3">
           <div className="h-8 w-8 rounded bg-ecu-gold" aria-hidden />
-          <span className="font-semibold">{process.env.NEXT_PUBLIC_SITE_NAME ?? 'Pirate Nation'}</span>
+          <span className="font-semibold">{process.env.NEXT_PUBLIC_SITE_NAME ?? 'Purple Armada'}</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm">
           <Link href="/map" className="hover:text-ecu-gold">Map</Link>

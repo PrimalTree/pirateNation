@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
     const serviceKey = (process.env.SUPABASE_SERVICE_ROLE as string) || (process.env.SUPABASE_SERVICE_ROLE_KEY as string);
     if (!supabaseUrl || !serviceKey) return new Response('Supabase not configured', { status: 500 });
     const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
-    const ip = req.headers.get('x-forwarded-for') || req.ip || undefined as any;
-    const ua = req.headers.get('user-agent') || undefined;
+    const ip = req.headers.get('x-forwarded-for') ?? undefined;
+    const ua = req.headers.get('user-agent') ?? undefined;
     const { error } = await supabase.from('poll_votes').insert({
       poll_key: String(pollKey),
       option_key: String(optionKey),

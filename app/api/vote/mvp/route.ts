@@ -30,8 +30,8 @@ export async function POST(req: NextRequest) {
     if (!supabaseUrl || !serviceKey) return new Response('Supabase not configured', { status: 500 });
     const supabase = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
 
-    const ip = req.headers.get('x-forwarded-for') || req.ip || undefined as any;
-    const ua = req.headers.get('user-agent') || undefined;
+    const ip = req.headers.get('x-forwarded-for') ?? undefined;
+    const ua = req.headers.get('user-agent') ?? undefined;
     const payload = {
       category,
       player_id: String(playerId),

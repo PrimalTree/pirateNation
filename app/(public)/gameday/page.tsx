@@ -203,7 +203,7 @@ export default function Page() {
         <div className="relative z-10 grid items-center gap-6 md:grid-cols-2">
           <div>
             <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-              <ClientOnly>Raise the Flag</ClientOnly>
+              <ClientOnly>Hoist the Colors!</ClientOnly>
             </h1>
             <p className="mt-2 max-w-prose text-zinc-300">Never miss the tradition. Tap the button and wave your phone — your digital flag will do the rest.</p>
             <div className="mt-4 flex flex-wrap gap-3">
@@ -211,7 +211,7 @@ export default function Page() {
             </div>
           </div>
           <div>
-            <Link href="/flag" aria-label="Raise the Flag">
+            <Link href="/flag" aria-label="Hoist the Colors!">
               <FlagCard className="max-w-[280px] md:max-w-[320px]" />
             </Link>
           </div>
