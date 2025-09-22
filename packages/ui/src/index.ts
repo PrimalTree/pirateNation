@@ -8,4 +8,3 @@ export { Skeleton } from './lib/Skeleton';
 export { Avatar } from './lib/Avatar';
 export { Table } from './lib/Table';
 export { DataTable } from './lib/DataTable';
-export { default as MockupApp } from './mockup';
