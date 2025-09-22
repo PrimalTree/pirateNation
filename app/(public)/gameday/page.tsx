@@ -8,7 +8,6 @@ import scheduleData from '../../../data/public/schedule.json';
 import { StadiumMap } from '../../../components/StadiumMap';
 import { PregameInfo } from '../../../components/gameday/PregameInfo';
 import { TeamStats } from '../../../components/gameday/TeamStats';
-import { PlayerLeaders } from '../../../components/gameday/PlayerLeaders';
 
 function Glow() {
   return (
@@ -143,7 +142,8 @@ export default function Page() {
       <PregameInfo />
       <div className="grid gap-4 md:grid-cols-2">
         <TeamStats />
-        <PlayerLeaders />
+        {/* PlayerLeaders component was removed because the ESPN API endpoint is no longer available. */}
+        {/* It can be re-added when a new data source is available. */}
       </div>
       {(() => {
         const events = Array.isArray(liveGames) ? liveGames : [];

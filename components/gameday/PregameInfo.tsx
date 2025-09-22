@@ -72,10 +72,9 @@ export function PregameInfo() {
           {/* Weather */}
           <div className="md:col-span-3">
             <div className="text-zinc-400">Weather</div>
-            {data?.weather ? (
+            {data && data.weather ? (
               <div className="mt-1 flex items-center gap-3">
                 {data.weather.icon ? (
-                  // OpenWeather icon
                   <img
                     src={`https://openweathermap.org/img/wn/${data.weather.icon}@2x.png`}
                     alt={data.weather.description || 'Weather'}
@@ -90,8 +89,8 @@ export function PregameInfo() {
                     <span className="ml-2 capitalize text-zinc-300">{String(data.weather.description)}</span>
                   ) : null}
                   <div className="text-xs text-zinc-400">
-                    {typeof data.weather.wind_mph === 'number' ? `Wind ${Math.round(data.weather.wind_mph)} mph` : ''}
-                    {typeof data.weather.humidity === 'number' ? `${typeof data.weather.wind_mph === 'number' ? ' • ' : ''}Humidity ${data.weather.humidity}%` : ''}
+                    {(typeof data.weather.wind_mph === 'number' && `Wind ${Math.round(data.weather.wind_mph)} mph`) || ''}
+                    {(typeof data.weather.humidity === 'number' && (typeof data.weather.wind_mph === 'number' ? ' • ' : '') + `Humidity ${data.weather.humidity}%`) || ''}
                   </div>
                 </div>
               </div>

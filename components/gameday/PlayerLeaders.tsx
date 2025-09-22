@@ -1,4 +1,8 @@
 "use client";
+// NOTE: This component is temporarily disabled because the ESPN API for player leaders is no longer reliable.
+// To re-enable, switch the data provider to 'cfbd' and provide a valid CFBD_API_KEY.
+// The component is currently not rendered in `app/(public)/gameday/page.tsx`.
+
 import { useEffect, useState } from 'react';
 
 type Leaders = Record<string, { name: string; value: number | string }>;
