@@ -1,12 +1,17 @@
-const preset = require('@pirate-nation/config/tailwind');
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    './app/**/*.{ts,tsx}',
-    './shared/**/*.{ts,tsx}',
-    './packages/ui/**/*.{ts,tsx}'
+    './app/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
+    './packages/ui/**/*.{js,ts,jsx,tsx}'
+,
   ],
-  presets: [preset]
+  theme: {
+    extend: {
+      colors: {
+        'ecu-gold': '#FFC72C', // ECU official gold
+      },
+    },
+  },
+  plugins: [],
 };
-
