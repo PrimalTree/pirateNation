@@ -1,6 +1,6 @@
 import roster from '../../../data/public/roster.json';
 import { fetchEspnTeamRoster, normalizeEspnTeamRoster } from '@pirate-nation/fetcher';
-import { DonationForm } from '@components/support/DonationForm';
+import { DonationButtons } from './DonationButtons';
 
 type Player = { id: string; name: string; position?: string; number?: number };
 
@@ -51,8 +51,7 @@ export default async function SupportPage() {
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
 
-        <button onClick={() => window.location.href = 'https://ecupirateclub.com/'}> PIRATE CLUB</button>
-        <button onClick={() => window.location.href = 'https://teamboneyard.org/'}> TEAM BONEYARD</button>
+        <DonationButtons />
         {/* <DonationForm /> */}
         {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
       </section>
