@@ -4,7 +4,7 @@ import { DonationButtons } from './DonationButtons';
 
 type Player = { id: string; name: string; position?: string; number?: number };
 
-export default async function SupportPage() {
+export default async function DonatePage() {
   let raw: Array<Player> | null = null;
   try {
     const live = await fetchEspnTeamRoster('151');
@@ -26,8 +26,15 @@ export default async function SupportPage() {
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
-        <h1 className="text-3xl font-bold">Support</h1>
+        <h1 className="text-3xl font-bold">Donate</h1>
         <p className="mt-2 text-zinc-300">Show your support and connect with the team.</p>
+      </section>
+
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+        <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
+
+        <DonationButtons />
+        {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
@@ -46,14 +53,6 @@ export default async function SupportPage() {
             </div>
           ))}
         </div>
-      </section>
-
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
-
-        <DonationButtons />
-        {/* <DonationForm /> */}
-        {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
       </section>
     </div>
   );

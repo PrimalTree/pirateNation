@@ -27,8 +27,8 @@ export function Footer() {
         <div>
           <div className="mb-2 font-semibold text-zinc-200">Help &amp; Support</div>
           <ul className="space-y-1">
-            <li><Link href="/support" className="hover:text-white">Support</Link></li>
-            <li><Link href="/support/help" className="hover:text-white">Help</Link></li>
+            <li><Link href="/donate" className="hover:text-white">Donate</Link></li>
+            <li><Link href="/donate/help" className="hover:text-white">Help</Link></li>
           </ul>
         </div>
         <div>
