@@ -1,3 +1,5 @@
+'use client';
+
 import roster from '../../../data/public/roster.json';
 import { fetchEspnTeamRoster, normalizeEspnTeamRoster } from '@pirate-nation/fetcher';
 import { DonationButtons } from './DonationButtons';
@@ -10,7 +12,7 @@ export default async function DonatePage() {
     const live = await fetchEspnTeamRoster('151');
     const norm = normalizeEspnTeamRoster(live) as Array<any>;
     raw = norm.map((p) => ({ id: String(p.id), name: String(p.name), position: p.position, number: typeof p.number === 'number' ? p.number : undefined }));
-  } catch {}
+  } catch { }
   if (!raw) {
     raw = (roster as any).players as Array<Player>;
   }
@@ -27,7 +29,7 @@ export default async function DonatePage() {
     <div className="space-y-8">
       <section className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
         <h1 className="text-3xl font-bold">Donate</h1>
-        <p className="mt-2 text-zinc-300">Show your support and connect with the team.</p>
+        <p className="mt-2 text-zinc-300">Support ECU student-athletes through NIL collectives.</p>
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
@@ -53,6 +55,27 @@ export default async function DonatePage() {
             </div>
           ))}
         </div>
+      </section>
+
+      <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+        <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
+
+        <button
+          onClick={() => window.open('https://ecupirateclub.com/', '_blank')}
+          className="inline-block px-4 py-2 m-2 bg-purple-600 text-white rounded hover:bg-purple-700"
+        >
+          PIRATE CLUB
+        </button>
+
+        <button
+          onClick={() => window.open('https://teamboneyard.org/', '_blank')}
+          className="inline-block px-4 py-2 m-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
+        >
+          TEAM BONEYARD
+        </button>
+
+        {/* <DonationForm /> */}
+        {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
       </section>
     </div>
   );

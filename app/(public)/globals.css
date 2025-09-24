@@ -18,7 +18,8 @@ html, body {
 }
 
 /* Prefer gold accents on hover for links */
-a:hover {
-  @apply text-ecu-gold;
+@layer utilities {
+  a:hover {
+    color:#FDC82F text-ecu-gold;
+  }
 }
-
