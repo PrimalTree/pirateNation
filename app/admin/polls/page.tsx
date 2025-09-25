@@ -19,6 +19,8 @@ export default function PollsPage() {
       body: JSON.stringify({ question, options: options.split(',').map(s => s.trim()).filter(Boolean) })
     });
     setQuestion(''); setOptions('');
+    // Refresh list
+    try { const list = await fetch('/api/polls').then(r => r.json()); setPolls(Array.isArray(list) ? list : []); } catch {}
   }
 
   return (

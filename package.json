@@ -20,7 +20,8 @@
     "poller:mock": "node dist/cron/mockScorePoller.js",
     "mock:poller:local": "pnpm compile-cron && node dist/cron/mockScorePoller.js",
     "update-data": "tsc -p tsconfig.cron.json && node dist/cron/updateData.js",
-    "compile-cron": "tsc -p tsconfig.cron.json"
+    "compile-cron": "tsc -p tsconfig.cron.json",
+    "roster:cfbd": "tsc -p tsconfig.cron.json && node dist/cron/fetchRosterFromCFBD.js"
   },
   "dependencies": {
     "@pirate-nation/fetcher": "workspace:*",

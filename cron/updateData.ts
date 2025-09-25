@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -7,6 +8,27 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const ECU_TEAM_ID = '151';
+const CFBD_API_KEY = process.env.CFBD_API_KEY as string | undefined;
+const CFBD_TEAM_NAME = (process.env.CFBD_TEAM_NAME as string) || 'East Carolina';
+const CFBD_YEAR = Number(process.env.CFBD_YEAR || new Date().getFullYear());
+
+async function fetchCfbdRoster(): Promise<any[]> {
+  if (!CFBD_API_KEY) return [];
+  const url = new URL('https://api.collegefootballdata.com/roster');
+  url.searchParams.set('team', CFBD_TEAM_NAME);
+  url.searchParams.set('year', String(CFBD_YEAR));
+  const res = await fetch(url.toString(), { headers: { Authorization: `Bearer ${CFBD_API_KEY}` } });
+  if (!res.ok) throw new Error(`CFBD roster failed: ${res.status}`);
+  const json = await res.json();
+  const arr = Array.isArray(json) ? json : [];
+  // Map to public roster schema
+  return arr.map((p: any) => ({
+    id: String(p.id ?? ''),
+    name: [p.first_name, p.last_name].filter(Boolean).join(' ').trim(),
+    position: (p.position || '').toString().toUpperCase() || undefined,
+    number: typeof p.jersey === 'string' ? parseInt(p.jersey, 10) : (Number.isFinite(p.jersey) ? p.jersey : undefined),
+  })).filter((x: any) => x.name);
+}
 
 async function main() {
   console.log('Updating data files...');
@@ -85,11 +107,22 @@ async function main() {
       games: enrichedGames,
     };
 
-    const rosterData = await fetchEspnTeamRoster(ECU_TEAM_ID);
-    const normalizedRoster = normalizeEspnTeamRoster(rosterData);
+    // Prefer CFBD roster when API key present; fallback to ESPN
+    let normalizedRoster: any[] = [];
+    if (CFBD_API_KEY) {
+      try {
+        normalizedRoster = await fetchCfbdRoster();
+      } catch (e) {
+        console.warn('[update-data] CFBD roster failed, falling back to ESPN:', (e as any)?.message || e);
+      }
+    }
+    if (!Array.isArray(normalizedRoster) || normalizedRoster.length === 0) {
+      const rosterData = await fetchEspnTeamRoster(ECU_TEAM_ID);
+      normalizedRoster = normalizeEspnTeamRoster(rosterData);
+    }
 
     const roster = {
-      team: 'East Carolina Pirates',
+      team: `${CFBD_TEAM_NAME} Pirates`.trim(),
       season: new Date().getFullYear(),
       players: normalizedRoster,
     };

@@ -26,7 +26,7 @@ export default async function GamePage({ params }: GameRouteParams) {
 
   const { data: game } = await supabase
     .from('games')
-    .select('id,name,settings')
+    .select('id,name,settings,score_json')
     .eq('id', id)
     .maybeSingle();
 
@@ -68,14 +68,22 @@ export default async function GamePage({ params }: GameRouteParams) {
     .order('created_at', { ascending: false })
     .limit(20);
 
-  const whenIso: string | undefined = (game as any)?.when || (game?.settings as any)?.when;
-  const teams: any[] | undefined = (game?.settings as any)?.teams;
-  const broadcast: string | undefined = (game?.settings as any)?.broadcast;
+  // Prefer live score from live_games, fallback to games.score_json/settings
+  const { data: live } = await supabase
+    .from('live_games')
+    .select('game_id, score_json, updated_at')
+    .eq('game_id', id)
+    .maybeSingle();
+
+  const score: any = (live as any)?.score_json ?? (game as any)?.score_json ?? (game?.settings as any);
+  const whenIso: string | undefined = (score as any)?.when;
+  const teams: any[] | undefined = (score as any)?.teams;
+  const broadcast: string | undefined = (score as any)?.broadcast;
 
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <h1 className="text-2xl font-semibold">{game?.name || 'Game'}</h1>
+        <h1 className="text-2xl font-semibold">{game?.name || (score as any)?.name || 'Game'}</h1>
         <div className="mt-2 grid gap-2 text-sm text-zinc-300 md:grid-cols-3">
           <div>
             <span className="text-zinc-400">Opponents:</span> {teams?.map((t: any) => t?.name).filter(Boolean).join(' vs ') || 'TBD'}
@@ -87,12 +95,9 @@ export default async function GamePage({ params }: GameRouteParams) {
             <span className="text-zinc-400">Broadcast:</span> {broadcast || 'TBD'}
           </div>
         </div>
-        {game?.id && (
+        {id && (
           <div className="mt-4">
-            <LiveScoreStrip
-              gameId={game.id}
-              initialScore={(game as any)?.score_json ?? { teams: teams ?? [] }}
-            />
+            <LiveScoreStrip gameId={id} initialScore={score ?? { teams: teams ?? [] }} />
           </div>
         )}
       </section>

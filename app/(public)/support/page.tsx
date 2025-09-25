@@ -1,8 +1,8 @@
 'use client';
 
+import React from 'react';
 import roster from '../../../data/public/roster.json';
 import { fetchEspnTeamRoster, normalizeEspnTeamRoster } from '@pirate-nation/fetcher';
-import { DonationButtons } from './DonationButtons';
 
 type Player = { id: string; name: string; position?: string; number?: number };
 

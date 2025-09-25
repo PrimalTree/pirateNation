@@ -11,20 +11,34 @@ export default function LiveScoreStrip({ gameId, initialScore }: { gameId: strin
   const [score, setScore] = useState<ScoreData | undefined>(initialScore);
 
   useEffect(() => {
-    const channel = supabase
-      .channel(`game-${gameId}`)
+    // Prefer live_games updates by provider game_id; fall back to games table if present
+    const liveCh = supabase
+      .channel(`live-game-${gameId}`)
+      .on(
+        'postgres_changes',
+        { event: 'UPDATE', schema: 'public', table: 'live_games', filter: `game_id=eq.${gameId}` },
+        (payload) => {
+          const next = (payload.new as any)?.score_json;
+          if (next) setScore(next);
+        }
+      )
+      .subscribe();
+
+    const gamesCh = supabase
+      .channel(`games-${gameId}`)
       .on(
         'postgres_changes',
         { event: 'UPDATE', schema: 'public', table: 'games', filter: `id=eq.${gameId}` },
         (payload) => {
           const next = (payload.new as any)?.score_json ?? (payload.new as any)?.settings;
-          setScore(next);
+          if (next) setScore(next);
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      supabase.removeChannel(liveCh);
+      supabase.removeChannel(gamesCh);
     };
   }, [gameId, supabase]);
 

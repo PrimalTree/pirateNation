@@ -11,7 +11,8 @@
   "include": ["cron/**/*.ts", "services/**/*.ts"],
   "files": [
     "cron/fetchLiveScores.ts",
-    "cron/mockScorePoller.ts"
+    "cron/mockScorePoller.ts",
+    "cron/fetchRosterFromCFBD.ts"
   ],
   "exclude": ["node_modules"]
 }
