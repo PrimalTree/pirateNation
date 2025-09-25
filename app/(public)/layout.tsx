@@ -21,8 +21,6 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
       <SponsorBanner />
       <main className="mx-auto max-w-6xl p-6">{children}</main>
       <Footer />
-      {/* Move announcements below footer so it appears under "Powered by Primal Tree" */}
-      <AnnouncementsBar />
       {/* Spacer so footer isn't hidden behind fixed BottomNav on small screens */}
       <div className="h-20 md:hidden" aria-hidden />
       <PWARegister />

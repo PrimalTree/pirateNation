@@ -6,6 +6,9 @@ import {
   fetchEspnTeamSchedule,
   normalizeEspnTeamSchedule,
 } from '@pirate-nation/fetcher';
+import 
+
+declare const process: NodeJS.Process;
 
 const ECU_NAME = process.env.TEAM_NAME?.toLowerCase() || 'east carolina';
 const ECU_TEAM_ID = '151'; // ESPN team ID

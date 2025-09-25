@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { AnnouncementsBar } from './AnnouncementsBar';
 
 export function Footer() {
   // Keep static to avoid hydration differences
@@ -42,6 +43,8 @@ export function Footer() {
       <div className="border-t border-ecu-purple/40 py-4 text-center">
         <div className="text-xs text-zinc-500">© {yearText} Primal Tree</div>
       </div>
+      {/* Place announcements immediately below the footer credit line */}
+      <AnnouncementsBar />
     </footer>
   );
 }
