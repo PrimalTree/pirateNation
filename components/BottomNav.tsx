@@ -56,7 +56,7 @@ export function BottomNav() {
       <div className="mx-auto grid max-w-6xl grid-cols-3 px-2">
         <Item href="/gameday" label="Gameday" Icon={Ticket} />
         <Item href="/engage" label="Engage" Icon={MessageSquare} />
-        <Item href="/support" label="Support" Icon={HandHeart} />
+        <Item href="/donate" label="Support" Icon={HandHeart} />
       </div>
     </nav>
   );

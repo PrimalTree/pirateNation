@@ -1,21 +1,16 @@
-'use client';
-
 import React from 'react';
 import roster from '../../../data/public/roster.json';
-import { fetchEspnTeamRoster, normalizeEspnTeamRoster } from '@pirate-nation/fetcher';
+import { DonationButtons } from './DonationButtons';
 
 type Player = { id: string; name: string; position?: string; number?: number };
 
 export default async function DonatePage() {
-  let raw: Array<Player> | null = null;
-  try {
-    const live = await fetchEspnTeamRoster('151');
-    const norm = normalizeEspnTeamRoster(live) as Array<any>;
-    raw = norm.map((p) => ({ id: String(p.id), name: String(p.name), position: p.position, number: typeof p.number === 'number' ? p.number : undefined }));
-  } catch { }
-  if (!raw) {
-    raw = (roster as any).players as Array<Player>;
-  }
+  // Use the compiled/static roster for reliability; live fetching is commented out for now
+  // const live = await fetchEspnTeamRoster('151');
+  // const norm = normalizeEspnTeamRoster(live) as Array<any>;
+  // const raw: Player[] = norm.map((p) => ({ id: String(p.id), name: String(p.name), position: p.position, number: typeof p.number === 'number' ? p.number : undefined }));
+  const raw: Player[] = ((roster as any).players ?? []) as Player[];
+
   // Ensure full team is shown: dedupe by id and sort by jersey number then name
   const playersMap = new Map<string, Player>();
   for (const p of raw) playersMap.set(p.id, p);
@@ -25,6 +20,7 @@ export default async function DonatePage() {
     if (an !== bn) return an - bn;
     return a.name.localeCompare(b.name);
   });
+
   return (
     <div className="space-y-8">
       <section className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
@@ -33,10 +29,9 @@ export default async function DonatePage() {
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
-
+        <h2 className="mb-3 text-xl font-semibold">NIL Collectives</h2>
         <DonationButtons />
-        {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
+        <p className="mt-3 text-xs text-zinc-400">More ways to give <span className="italic">coming soon</span>.</p>
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
@@ -45,7 +40,7 @@ export default async function DonatePage() {
           <div className="text-sm text-zinc-400">{players.length} players</div>
         </div>
         <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3">
-          {players?.map((p) => (
+          {players.map((p) => (
             <div key={p.id} className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2">
               <div>
                 <div className="font-medium text-zinc-100">{p.name}</div>
@@ -58,24 +53,9 @@ export default async function DonatePage() {
       </section>
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
-        <h2 className="mb-3 text-xl font-semibold">Make a Donation</h2>
-
-        <button
-          onClick={() => window.open('https://ecupirateclub.com/', '_blank')}
-          className="inline-block px-4 py-2 m-2 bg-purple-600 text-white rounded hover:bg-purple-700"
-        >
-          PIRATE CLUB
-        </button>
-
-        <button
-          onClick={() => window.open('https://teamboneyard.org/', '_blank')}
-          className="inline-block px-4 py-2 m-2 bg-yellow-600 text-white rounded hover:bg-yellow-700"
-        >
-          TEAM BONEYARD
-        </button>
-
+        <h2 className="mb-2 text-lg font-semibold">Give In-App</h2>
         {/* <DonationForm /> */}
-        {/*<p className="mt-3 text-xs text-zinc-400">Donations support OMVP, DMVP, or the Team. Payments are processed via PayPal.</p>*/}
+        <div className="text-sm text-zinc-400">In-app donations <span className="italic">coming soon</span>.</div>
       </section>
     </div>
   );

@@ -1,219 +1,128 @@
-"use client";
-import React from "react";
-import { useMemo, useState, useEffect } from "react";
+// components/support/DonationForm.tsx
+'use client';
+import { useState, useEffect } from 'react';
+import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
+import { createClient } from '../../app/(public)/lib/supabase-browser'; // Adjust path to shared/supabase-browser
+import type { Player, Donation } from '@pirate-nation/types'; // Add Donation/Player types if not there
 
-type Recipient = "OMVP" | "DMVP" | "TEAM" | "PLAYER";
+interface DonationFormProps {
+  onSuccess?: (orderId: string) => void; // Optional callback for parent
+}
 
-const AMOUNTS = [5, 10, 25, 50, 100] as const;
-
-// Replace with your actual PayPal donation page link
-const PAYPAL_DONATION_PAGE =
-  "https://www.paypal.com/donate/?hosted_button_id=YOUR_BUTTON_ID";
-
-type Player = { id: string; name: string };
-
-export function DonationForm() {
-  const [recipient, setRecipient] = useState<Recipient>("TEAM");
-  const [player, setPlayer] = useState<string>("");
+export default function DonationForm({ onSuccess }: DonationFormProps) {
   const [players, setPlayers] = useState<Player[]>([]);
-  const [message, setMessage] = useState("");
-  const [amount, setAmount] = useState<number | "">("");
-  const [customMode, setCustomMode] = useState(false);
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [donation, setDonation] = useState<Donation>({ amount: 19.81, type: 'sponsorship' });
+  const [loading, setLoading] = useState(true);
 
-  const disabled = useMemo(() => {
-    if (busy) return true;
-    if (recipient === "PLAYER" && !player) return true;
-    if (amount === "" || Number(amount) <= 0) return true;
-    return false;
-  }, [busy, recipient, player, amount]);
-
-  // Fetch roster
+  // Fetch ECU players for sponsorship buttons
   useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch("/api/roster");
-        if (res.ok) {
-          const data = await res.json();
-          setPlayers(data.players || []);
-        }
-      } catch (err) {
-        console.error("Failed to fetch roster", err);
-      }
-    })();
+    const fetchPlayers = async () => {
+      const supabase = createClient();
+      const { data } = await supabase.from('players').select('*').eq('team', 'ECU'); // Filter for Pirates
+      setPlayers(data || []);
+      setLoading(false);
+    };
+    fetchPlayers();
   }, []);
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    setError(null);
-    setBusy(true);
+  // Log to Supabase on success
+  const handleApprove = async (data: any, actions: any) => {
+    const order = await actions.order?.capture();
+    const supabase = createClient();
+    await supabase.from('donations').insert({
+      amount: donation.amount,
+      athlete_id: donation.athleteId,
+      type: donation.type,
+      order_id: order?.id || '',
+      created_at: new Date().toISOString(),
+    });
+    onSuccess?.(order?.id || '');
+    alert('Argh! Pirate sponsorship captured—funds en route to ECU stars! 🏴‍☠️');
+  };
 
-    try {
-      const amt = Number(amount);
-      if (!amt || amt <= 0) throw new Error("Invalid donation amount");
+  const createOrder = (data: any, actions: any) => {
+    return actions.order.create({
+      purchase_units: [
+        {
+          amount: { value: donation.amount.toFixed(2), currency_code: 'USD' },
+          description: `NIL Sponsorship: ${donation.athleteId ? `Athlete ${donation.athleteId}` : 'Purple Armada Collective'}`,
+          custom_id: JSON.stringify({ type: donation.type, athleteId: donation.athleteId }),
+        },
+      ],
+    });
+  };
 
-      // 1. Log donation intent
-      await fetch("/api/donate/log", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipient,
-          playerId: recipient === "PLAYER" ? player : null,
-          message: message.slice(0, 250),
-          amount: amt,
-        }),
-      });
-
-      // 2. Build PayPal redirect URL
-      const label =
-        recipient === "PLAYER" && player
-          ? `Donation to Player ${player}`
-          : `Donation to ${recipient}`;
-      const encodedLabel = encodeURIComponent(label);
-
-      const paypalUrl = `${PAYPAL_DONATION_PAGE}&amount=${amt}&item_name=${encodedLabel}`;
-
-      // 3. Redirect
-      window.location.href = paypalUrl;
-    } catch (err: any) {
-      setError(err?.message || "Failed to start donation");
-    } finally {
-      setBusy(false);
-    }
-  }
+  if (loading) return <div className="text-center py-8">Loading Pirate rosters...</div>;
 
   return (
-    <form onSubmit={submit} className="space-y-4">
-      {/* Recipient selection */}
-      <div>
-        <div className="mb-2 font-semibold">Choose recipient</div>
-        <div className="flex gap-2 flex-wrap">
-          {(["OMVP", "DMVP", "TEAM", "PLAYER"] as Recipient[]).map((r) => (
-            <button
-              type="button"
-              key={r}
-              onClick={() => setRecipient(r)}
-              className={[
-                "rounded-lg border px-3 py-1 text-sm",
-                recipient === r
-                  ? "border-ecu-gold bg-ecu-gold text-black"
-                  : "border-zinc-700 text-zinc-200 hover:bg-zinc-800",
-              ].join(" ")}
-            >
-              {r}
-            </button>
-          ))}
-        </div>
-      </div>
+    <section className="bg-white rounded-lg shadow-md p-6 mt-8 text-center">
+      <h2 className="text-2xl font-bold text-purple-800 mb-4">Sponsor a Pirate Below! 🏴‍☠️</h2>
+      <p className="text-gray-600 mb-6 text-sm">
+        Back ECU athletes’ NIL—gear, shoutouts, more. Via Primal Tree LLC, non-tax-deductible.
+      </p>
 
-      {/* Player select */}
-      {recipient === "PLAYER" && (
-        <div>
-          <label className="mb-1 block text-sm font-medium">Select player</label>
-          <select
-            value={player}
-            onChange={(e) => setPlayer(e.target.value)}
-            className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-2 text-zinc-100"
-          >
-            <option value="">-- Choose a player --</option>
-            {players.map((p) => (
-              <option key={p.id} value={p.name}>
-                {p.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
-
-      {/* Message */}
-      <div>
-        <label className="mb-1 block text-sm font-medium">
-          Message (optional)
+      {/* Amount Picker */}
+      <div className="mb-6">
+        <label htmlFor="amount" className="block text-lg font-medium text-gray-700 mb-2">
+          Sponsorship Tier
         </label>
-        <textarea
-          value={message}
-          onChange={(e) => setMessage(e.target.value.slice(0, 250))}
-          maxLength={250}
-          rows={4}
-          className="w-full rounded-lg border border-zinc-700 bg-zinc-900 p-2 text-zinc-100"
-          placeholder="Say something to the team (max 250 chars)"
-        />
-        <div className="mt-1 text-right text-xs text-zinc-500">
-          {message.length}/250
+        <select
+          id="amount"
+          className="p-2 border border-gray-300 rounded-md w-full max-w-xs mx-auto"
+          value={donation.amount}
+          onChange={(e) => setDonation({ ...donation, amount: Number(e.target.value) })}
+        >
+          {[
+            { label: '$19.81 - Natty Legacy Boost', value: 19.81 },
+            { label: '$25 - Gear Up', value: 25 },
+            { label: '$50 - Shoutout Star', value: 50 },
+            { label: '$100 - Game Day Hero', value: 100 },
+          ].map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* PayPal Buttons: Per-Player + Collective */}
+      <div className="space-y-4 max-w-md mx-auto">
+        {players.map((player) => (
+          <div key={player.id} className="border-t pt-4">
+            <h3 className="text-sm font-medium text-purple-800 mb-2">#{player.number} {player.name} ({player.position})</h3>
+            <PayPalScriptProvider
+              options={{
+                'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+                currency: 'USD',
+              }}
+            >
+              <PayPalButtons
+                createOrder={createOrder}
+                onApprove={handleApprove}
+                style={{ layout: 'vertical', color: 'gold', label: 'donate', height: 45 }} // ECU gold vibe
+              />
+            </PayPalScriptProvider>
+          </div>
+        ))}
+        {/* Collective Button */}
+        <div className="border-t pt-4">
+          <h3 className="text-sm font-medium text-purple-800 mb-2">Support the Full Armada</h3>
+          <PayPalScriptProvider
+            options={{
+              'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
+              currency: 'USD',
+            }}
+          >
+            <PayPalButtons
+              createOrder={(data, actions) =>
+                createOrder(data, actions) // Reuse with no athleteId
+              }
+              onApprove={handleApprove}
+              style={{ layout: 'vertical', color: 'gold', label: 'donate', height: 45 }}
+            />
+          </PayPalScriptProvider>
         </div>
       </div>
-
-      {/* Amount */}
-      <div>
-        <div className="mb-2 font-semibold">Select amount</div>
-        {!customMode ? (
-          <div className="flex flex-wrap gap-2">
-            {AMOUNTS.map((a) => (
-              <button
-                type="button"
-                key={a}
-                onClick={() => setAmount(a)}
-                className={[
-                  "rounded-lg border px-3 py-1 text-sm",
-                  amount === a
-                    ? "border-ecu-gold bg-ecu-gold text-black"
-                    : "border-zinc-700 text-zinc-200 hover:bg-zinc-800",
-                ].join(" ")}
-              >
-                ${a}
-              </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => {
-                setCustomMode(true);
-                setAmount("");
-              }}
-              className="rounded-lg border border-zinc-700 px-3 py-1 text-sm text-zinc-200 hover:bg-zinc-800"
-            >
-              Other
-            </button>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2">
-            <input
-              type="number"
-              min="1"
-              value={amount}
-              onChange={(e) => setAmount(Number(e.target.value))}
-              className="w-32 rounded-lg border border-zinc-700 bg-zinc-900 p-2 text-zinc-100"
-              placeholder="Enter amount"
-            />
-            <button
-              type="button"
-              onClick={() => {
-                setCustomMode(false);
-                setAmount(25); // default back
-              }}
-              className="text-sm text-zinc-400 hover:text-zinc-200"
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Error */}
-      {error && <div className="text-sm text-red-400">{error}</div>}
-
-      {/* Submit */}
-      <button
-        type="submit"
-        disabled={disabled}
-        className="w-full rounded-xl bg-ecu-gold px-4 py-2 font-semibold text-black hover:opacity-90 disabled:opacity-50"
-      >
-        {busy
-          ? "Processing..."
-          : amount
-          ? `Donate $${amount}`
-          : "Donate"}
-      </button>
-    </form>
+    </section>
   );
 }
