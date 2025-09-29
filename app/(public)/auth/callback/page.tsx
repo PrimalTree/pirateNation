@@ -3,12 +3,18 @@ import { useEffect, useState } from 'react';
 import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 export default function AuthCallback() {
-  const supabase = createSupabaseBrowser();
+  const [supabase, setSupabase] = useState<any | null>(null);
   const [status, setStatus] = useState('Exchanging code...');
+
+  // Lazily initialize on client to avoid build-time env requirements
+  useEffect(() => {
+    try { setSupabase(createSupabaseBrowser()); } catch {}
+  }, []);
 
   useEffect(() => {
     (async () => {
       try {
+        if (!supabase) return;
         const url = new URL(window.location.href);
         const err = url.searchParams.get('error');
         const errCode = url.searchParams.get('error_code');
@@ -27,7 +33,8 @@ export default function AuthCallback() {
         return;
       } catch (e: any) {
         // As a fallback for implicit flows where session is already in URL hash and stored
-        const { data, error } = await supabase.auth.getSession();
+        if (!supabase) return;
+        const { data, error }: any = await supabase.auth.getSession();
         if (data.session && !error) {
           setStatus('Signed in! Redirecting...');
           setTimeout(() => window.location.replace('/gameday'), 500);
@@ -36,10 +43,9 @@ export default function AuthCallback() {
         setStatus(`Error: ${e?.message || 'Sign-in failed'}`);
       }
     })();
-  }, [supabase.auth]);
+  }, [supabase]);
 
   return <div className="text-white/80">{status}</div>;
 }
-
 
 
