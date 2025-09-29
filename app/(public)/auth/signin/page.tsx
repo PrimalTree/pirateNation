@@ -6,7 +6,8 @@ import { useEffect, useState } from 'react';
 import { createSupabaseBrowser } from '@shared/supabase-browser';
 
 export default function SignInPage() {
-  const supabase = createSupabaseBrowser();
+  // Lazily create Supabase client on the client only to avoid build-time env errors
+  const [supabase, setSupabase] = useState<any | null>(null);
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [status, setStatus] = useState<string | null>(null);
   const [authed, setAuthed] = useState(false);
@@ -21,17 +22,26 @@ export default function SignInPage() {
   const [username, setUsername] = useState('');
 
   useEffect(() => {
+    try {
+      // Only create on client after mount
+      setSupabase(createSupabaseBrowser());
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     let alive = true;
-    supabase.auth.getUser().then(({ data }) => {
+    if (!supabase) return;
+    supabase.auth.getUser().then(({ data }: any) => {
       if (!alive) return;
       setAuthed(!!data.user);
     });
     return () => { alive = false; };
-  }, [supabase.auth]);
+  }, [supabase]);
 
   async function doSignIn(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!supabase) { setStatus('Client not ready'); return; }
       setStatus('Signing in…');
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
@@ -45,6 +55,7 @@ export default function SignInPage() {
   async function doSignUp(e: React.FormEvent) {
     e.preventDefault();
     try {
+      if (!supabase) { setStatus('Client not ready'); return; }
       if (!name.trim() || !dob || !username.trim() || !email.trim() || !password) {
         setStatus('Please fill all required fields.');
         return;
@@ -84,6 +95,7 @@ export default function SignInPage() {
     // If there is a pending profile and user just signed in, apply it
     (async () => {
       try {
+        if (!supabase) return;
         const raw = localStorage.getItem('pending_profile');
         if (!raw) return;
         const sess = await supabase.auth.getSession();
@@ -98,7 +110,7 @@ export default function SignInPage() {
         localStorage.removeItem('pending_profile');
       } catch {}
     })();
-  }, [supabase.auth]);
+  }, [supabase]);
 
   useEffect(() => {
     if (!authed) return;
