@@ -6,8 +6,6 @@ import {
   fetchEspnTeamSchedule,
   normalizeEspnTeamSchedule,
 } from '@pirate-nation/fetcher';
-import 
-
 declare const process: NodeJS.Process;
 
 const ECU_NAME = process.env.TEAM_NAME?.toLowerCase() || 'east carolina';
@@ -118,3 +116,4 @@ export async function GET() {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
   }
 }
+
