@@ -2,11 +2,8 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { randomUUID } from "crypto";
 
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE! // service role required for writes
-);
+// Note: Do not create the Supabase client at module scope to avoid
+// build-time failures when env vars are not present in CI.
 
 export async function POST(req: Request) {
   try {
@@ -24,6 +21,25 @@ export async function POST(req: Request) {
 
     // Generate unique donation ID (to tie intent → PayPal confirmation)
     const donationId = randomUUID();
+
+    // Initialize Supabase lazily with server-side credentials
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_SERVICE_ROLE =
+      process.env.SUPABASE_SERVICE_ROLE || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE) {
+      console.error(
+        "Missing Supabase env: SUPABASE_URL or SUPABASE_SERVICE_ROLE(_KEY)"
+      );
+      return NextResponse.json(
+        { error: "Server misconfiguration: Supabase not configured" },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE, {
+      auth: { persistSession: false },
+    });
 
     // Insert as "pending"
     const { error } = await supabase.from("donations").insert({
