@@ -4,6 +4,7 @@ import ClientOnly from '../../components/ClientOnly';
 import { Button } from '../../../packages/ui/src/lib/Button';
 import { FanVote } from '../../../components/engage/FanVote';
 import { QuickPoll } from '../../../components/engage/QuickPoll';
+import { GamedayPics } from '../../../components/engage/GamedayPics';
 
 function Glow() {
   return (
@@ -46,6 +47,8 @@ export default function Page() {
         <h4> Choose the 3rd QTR SONG!</h4>
         <QuickPoll options={[{ key: 'Keep Living on a Prayer', label: 'Keep Living on a Prayer' }, { key: 'Muse', label: 'Muse - Uprising' }, {key: 'RATM', label: 'RATM - Killing in the Name'}, { key: 'Wanted DOA', label: 'Bon Jovi - Wanted Dead or Alive' }, { key: 'Queen', label: 'Queen - We Will Rock You' } ]} />
       </section>
+
+      <GamedayPics />
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <h3 className="mb-2 font-semibold">Plunder COMING SOON</h3>
