@@ -1,5 +1,5 @@
 "use client";
-import { Button } from '../../../packages/ui/src/lib/Button';
+import { Button } from '@pn/ui';
 
 export function GamedayPics() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

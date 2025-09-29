@@ -1,7 +1,7 @@
 "use client";
 import Link from 'next/link';
 import ClientOnly from '../../components/ClientOnly';
-import { Button } from '../../../packages/ui/src/lib/Button';
+import { Button } from '@pn/ui';
 import { FanVote } from '../../../components/engage/FanVote';
 import { QuickPoll } from '../../../components/engage/QuickPoll';
 import { GamedayPics } from '../../../components/engage/GamedayPics';
