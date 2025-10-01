@@ -7,7 +7,7 @@ import { Footer } from '@components/Footer';
 import { PWARegister } from '@components/PWARegister';
 
 export const metadata = {
-  title: 'Pirate Nation Web',
+  title: 'Purple Armada Web',
   description: 'Web app stub'
 };
 
@@ -19,6 +19,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
         <TopBar />
       </div>
       <SponsorBanner />
+      <AnnouncementsBar />
       <main className="mx-auto max-w-6xl p-6">{children}</main>
       <Footer />
       {/* Spacer so footer isn't hidden behind fixed BottomNav on small screens */}

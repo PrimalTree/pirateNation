@@ -1,8 +1,8 @@
 // components/support/DonationForm.tsx
 'use client';
 import { useState } from 'react';
-import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
 import roster from '../../data/public/roster.json';
+import PayPalButtonsLite from './PayPalButtonsLite';
 
 interface DonationFormProps { onSuccess?: (orderId: string) => void }
 
@@ -121,18 +121,13 @@ export default function DonationForm({ onSuccess }: DonationFormProps) {
               ? 'Support the Full Armada'
               : 'Sponsor Selected Athlete'}
           </h3>
-          <PayPalScriptProvider
-            options={{
-              'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-              currency: 'USD',
-            }}
-          >
-            <PayPalButtons
-              createOrder={createOrder}
-              onApprove={handleApprove}
-              style={{ layout: 'vertical', color: 'gold', label: 'donate', height: 45 }}
-            />
-          </PayPalScriptProvider>
+          <PayPalButtonsLite
+            clientId={process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID as string}
+            currency="USD"
+            createOrder={createOrder}
+            onApprove={handleApprove}
+            style={{ layout: 'vertical', color: 'gold', label: 'donate', height: 45 }}
+          />
         </div>
       </div>
     </section>

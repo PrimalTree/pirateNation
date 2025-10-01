@@ -5,6 +5,7 @@ import Link from 'next/link';
 import ClientOnly from '../../components/ClientOnly';
 import { FlagCard } from '../../../components/gameday/FlagVisuals';
 import scheduleData from '../../../data/public/schedule.json';
+import { shortTeam, shortMatchup, shortFinalString } from '../../../components/gameday/teamName';
 import { StadiumMap } from '../../../components/StadiumMap';
 import { PregameInfo } from '../../../components/gameday/PregameInfo';
 import { TeamStats } from '../../../components/gameday/TeamStats';
@@ -287,21 +288,25 @@ export default function Page() {
                 let scoreText: string | null = null;
                 if (staticResult && (staticResult.homeScore ?? '') !== '' && (staticResult.awayScore ?? '') !== '') {
                   const hs = staticResult.homeScore as any; const as = staticResult.awayScore as any;
-                  scoreText = `${staticResult.away ?? 'Away'} ${as} – ${staticResult.home ?? 'Home'} ${hs}`;
+                  const homeName = shortTeam(staticResult.home);
+                  const awayName = shortTeam(staticResult.away);
+                  scoreText = `${awayName || 'Away'} ${as} – ${homeName || 'Home'} ${hs}`;
                 } else if (staticFinal) {
-                  scoreText = staticFinal;
+                  scoreText = shortFinalString(staticFinal);
                 } else if (lg) {
                   const teams: any[] = Array.isArray((lg as any)?.settings?.teams) ? (lg as any).settings!.teams as any[] : [];
                   const home = teams.find((t: any) => t?.homeAway === 'home') ?? teams[0];
                   const away = teams.find((t: any) => t?.homeAway === 'away') ?? teams[1];
                   const haveScores = home && away && (home?.score ?? '') !== '' && (away?.score ?? '') !== '';
-                  scoreText = haveScores ? `${away?.name ?? 'Away'} ${away?.score ?? ''} – ${home?.name ?? 'Home'} ${home?.score ?? ''}` : null;
+                  const hn = shortTeam(home?.name);
+                  const an = shortTeam(away?.name);
+                  scoreText = haveScores ? `${an || 'Away'} ${away?.score ?? ''} – ${hn || 'Home'} ${home?.score ?? ''}` : null;
                 }
                 const liveStatus = String((lg as any)?.settings?.status ?? '').toLowerCase();
                 const isLiveNow = /live|inprogress|in-progress|in/.test(liveStatus);
                 return (
                   <li key={i} className="flex items-center justify-between py-2 text-sm">
-                    <span className="text-zinc-200 truncate pr-3">{g.name}</span>
+                    <span className="text-zinc-200 truncate pr-3">{shortMatchup(g.name)}</span>
                     <span className="shrink-0 text-zinc-400 flex items-center gap-2">
                       {isLiveNow && (
                         <span className="rounded px-1.5 py-0.5 text-[10px] border border-emerald-400/40 text-emerald-200">Live</span>

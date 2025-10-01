@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { createSupabaseBrowser } from '@shared/supabase-browser';
+import { shortTeam } from '../../../../components/gameday/teamName';
 import { Trophy } from 'lucide-react';
 
 type ScoreTeam = { name?: string; score?: string | number; homeAway?: string };
@@ -58,12 +59,12 @@ export default function LiveScoreStrip({ gameId, initialScore }: { gameId: strin
       {teams.length ? (
         <div className="grid grid-cols-3 items-center text-center">
           <div className="text-zinc-300">
-            {away?.name ?? 'Away'}
+            {shortTeam(away?.name) || 'Away'}
             <div className="text-3xl font-bold">{typeof away?.score !== 'undefined' ? String(away?.score) : '-'}</div>
           </div>
           <div className="text-xs text-zinc-500">{phase}</div>
           <div className="text-zinc-300">
-            {home?.name ?? 'Home'}
+            {shortTeam(home?.name) || 'Home'}
             <div className="text-3xl font-bold">{typeof home?.score !== 'undefined' ? String(home?.score) : '-'}</div>
           </div>
         </div>
