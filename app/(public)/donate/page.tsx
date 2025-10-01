@@ -1,6 +1,7 @@
 import React from 'react';
 import roster from '../../../data/public/roster.json';
 import { DonationButtons } from './DonationButtons';
+import DonationForm from '../../../components/support/DonationForm';
 
 type Player = { id: string; name: string; position?: string; number?: number };
 
@@ -54,8 +55,7 @@ export default async function DonatePage() {
 
       <section className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
         <h2 className="mb-2 text-lg font-semibold">Give In-App</h2>
-        {/* <DonationForm /> */}
-        <div className="text-sm text-zinc-400">In-app donations <span className="italic">coming soon</span>.</div>
+        <DonationForm />
       </section>
     </div>
   );

@@ -1,58 +1,58 @@
 // components/support/DonationForm.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-import { createClient } from '../../app/(public)/lib/supabase-browser'; // Adjust path to shared/supabase-browser
-import type { Player, Donation } from '@pirate-nation/types'; // Add Donation/Player types if not there
+import roster from '../../data/public/roster.json';
 
-interface DonationFormProps {
-  onSuccess?: (orderId: string) => void; // Optional callback for parent
-}
+interface DonationFormProps { onSuccess?: (orderId: string) => void }
+
+type Player = { id: string; name: string; position?: string; number?: number };
+type Donation = { amount: number; type: 'sponsorship' | 'team'; athleteId?: string };
 
 export default function DonationForm({ onSuccess }: DonationFormProps) {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const [donation, setDonation] = useState<Donation>({ amount: 19.81, type: 'sponsorship' });
-  const [loading, setLoading] = useState(true);
+  const players: Player[] = ((roster as any).players ?? []) as Player[];
+  const [donation, setDonation] = useState<Donation>({ amount: 19.81, type: 'team' });
 
-  // Fetch ECU players for sponsorship buttons
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      const supabase = createClient();
-      const { data } = await supabase.from('players').select('*').eq('team', 'ECU'); // Filter for Pirates
-      setPlayers(data || []);
-      setLoading(false);
-    };
-    fetchPlayers();
-  }, []);
+  // Sort players by jersey then name for selector
+  const sortedPlayers = [...players].sort((a, b) => {
+    const an = typeof a.number === 'number' ? a.number : 9999;
+    const bn = typeof b.number === 'number' ? b.number : 9999;
+    if (an !== bn) return an - bn;
+    return a.name.localeCompare(b.name);
+  });
 
-  // Log to Supabase on success
-  const handleApprove = async (data: any, actions: any) => {
+  // Verify with server + record donation
+  const handleApprove = async (_data: any, actions: any) => {
     const order = await actions.order?.capture();
-    const supabase = createClient();
-    await supabase.from('donations').insert({
-      amount: donation.amount,
-      athlete_id: donation.athleteId,
-      type: donation.type,
-      order_id: order?.id || '',
-      created_at: new Date().toISOString(),
+    const orderId = order?.id as string | undefined;
+    if (!orderId) return;
+    await fetch('/api/donate/donate/paypal/record', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ order_id: orderId }),
     });
-    onSuccess?.(order?.id || '');
-    alert('Argh! Pirate sponsorship captured—funds en route to ECU stars! 🏴‍☠️');
+    onSuccess?.(orderId);
+    alert('Argh! Donation completed — thank you! 🏴‍☠️');
   };
 
-  const createOrder = (data: any, actions: any) => {
+  const createOrder = (_data: any, actions: any) => {
     return actions.order.create({
       purchase_units: [
         {
           amount: { value: donation.amount.toFixed(2), currency_code: 'USD' },
-          description: `NIL Sponsorship: ${donation.athleteId ? `Athlete ${donation.athleteId}` : 'Purple Armada Collective'}`,
-          custom_id: JSON.stringify({ type: donation.type, athleteId: donation.athleteId }),
+          description:
+            donation.type === 'team'
+              ? 'NIL Sponsorship: Purple Armada Collective'
+              : `NIL Sponsorship: Athlete ${donation.athleteId}`,
+          custom_id: JSON.stringify({
+            recipient: donation.type === 'team' ? 'TEAM' : 'PLAYER',
+            type: donation.type === 'team' ? 'TEAM' : 'PLAYER',
+            athleteId: donation.athleteId,
+          }),
         },
       ],
     });
   };
-
-  if (loading) return <div className="text-center py-8">Loading Pirate rosters...</div>;
 
   return (
     <section className="bg-white rounded-lg shadow-md p-6 mt-8 text-center">
@@ -85,28 +85,42 @@ export default function DonationForm({ onSuccess }: DonationFormProps) {
         </select>
       </div>
 
-      {/* PayPal Buttons: Per-Player + Collective */}
+      {/* Recipient Picker */}
+      <div className="mb-6">
+        <label htmlFor="recipient" className="block text-lg font-medium text-gray-700 mb-2">
+          Sponsor
+        </label>
+        <select
+          id="recipient"
+          className="p-2 border border-gray-300 rounded-md w-full max-w-xs mx-auto"
+          value={donation.type === 'team' ? 'team' : `player:${donation.athleteId}`}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (v === 'team') {
+              setDonation({ ...donation, type: 'team', athleteId: undefined });
+            } else if (v.startsWith('player:')) {
+              const id = v.substring('player:'.length);
+              setDonation({ ...donation, type: 'sponsorship', athleteId: id });
+            }
+          }}
+        >
+          <option value="team">Full Team — Purple Armada Collective</option>
+          {sortedPlayers.map((p) => (
+            <option key={p.id} value={`player:${p.id}`}>
+              {p.number != null ? `#${p.number} ` : ''}{p.name}{p.position ? ` (${p.position})` : ''}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* PayPal Button */}
       <div className="space-y-4 max-w-md mx-auto">
-        {players.map((player) => (
-          <div key={player.id} className="border-t pt-4">
-            <h3 className="text-sm font-medium text-purple-800 mb-2">#{player.number} {player.name} ({player.position})</h3>
-            <PayPalScriptProvider
-              options={{
-                'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
-                currency: 'USD',
-              }}
-            >
-              <PayPalButtons
-                createOrder={createOrder}
-                onApprove={handleApprove}
-                style={{ layout: 'vertical', color: 'gold', label: 'donate', height: 45 }} // ECU gold vibe
-              />
-            </PayPalScriptProvider>
-          </div>
-        ))}
-        {/* Collective Button */}
         <div className="border-t pt-4">
-          <h3 className="text-sm font-medium text-purple-800 mb-2">Support the Full Armada</h3>
+          <h3 className="text-sm font-medium text-purple-800 mb-2">
+            {donation.type === 'team'
+              ? 'Support the Full Armada'
+              : 'Sponsor Selected Athlete'}
+          </h3>
           <PayPalScriptProvider
             options={{
               'client-id': process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID!,
@@ -114,9 +128,7 @@ export default function DonationForm({ onSuccess }: DonationFormProps) {
             }}
           >
             <PayPalButtons
-              createOrder={(data, actions) =>
-                createOrder(data, actions) // Reuse with no athleteId
-              }
+              createOrder={createOrder}
               onApprove={handleApprove}
               style={{ layout: 'vertical', color: 'gold', label: 'donate', height: 45 }}
             />
