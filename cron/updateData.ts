@@ -3,6 +3,7 @@ import fs from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { fetchEspnTeamSchedule, normalizeEspnTeamSchedule, fetchEspnTeamRoster, normalizeEspnTeamRoster, fetchEspnScoreboard, normalizeEspnScoreboard } from '../services/fetcher/espn.js';
+import { cfbdProvider } from '../lib/scores/providers/cfbd.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -134,6 +135,43 @@ async function main() {
 
     await fs.writeFile(schedulePath, JSON.stringify(schedule, null, 2));
     await fs.writeFile(rosterPath, JSON.stringify(roster, null, 2));
+
+    // CFBD cached opponent stats (PPG, etc.) for offline fallback
+    if (CFBD_API_KEY) {
+      try {
+        const provider = cfbdProvider(CFBD_API_KEY);
+        const seasonGames = await provider.getTeamGames(CFBD_TEAM_NAME, CFBD_YEAR);
+        const opponents = new Set<string>();
+        for (const g of seasonGames) {
+          const home = String(g.home_team || '').trim();
+          const away = String(g.away_team || '').trim();
+          if (home && home.toLowerCase() !== CFBD_TEAM_NAME.toLowerCase()) opponents.add(home);
+          if (away && away.toLowerCase() !== CFBD_TEAM_NAME.toLowerCase()) opponents.add(away);
+        }
+
+        const cfbdDir = path.join(dataDir, 'cfbd', 'opponents');
+        await fs.mkdir(cfbdDir, { recursive: true });
+
+        // Also write our own team stats cache
+        const oursStats = await provider.getTeamStats(CFBD_TEAM_NAME, CFBD_YEAR);
+        const oursFile = path.join(dataDir, 'cfbd', 'team.json');
+        await fs.mkdir(path.dirname(oursFile), { recursive: true });
+        await fs.writeFile(oursFile, JSON.stringify({ team: CFBD_TEAM_NAME, season: CFBD_YEAR, stats: oursStats }, null, 2));
+
+        for (const opp of opponents) {
+          try {
+            const stats = await provider.getTeamStats(opp, CFBD_YEAR);
+            const safe = opp.replace(/[^a-z0-9]+/gi, '_').toLowerCase();
+            const file = path.join(cfbdDir, `${safe}.json`);
+            await fs.writeFile(file, JSON.stringify({ team: opp, season: CFBD_YEAR, stats }, null, 2));
+          } catch (e) {
+            console.warn(`[update-data] CFBD stats failed for ${opp}:`, (e as any)?.message || e);
+          }
+        }
+      } catch (e) {
+        console.warn('[update-data] CFBD caching step skipped:', (e as any)?.message || e);
+      }
+    }
 
     console.log('Data files updated successfully.');
   } catch (error) {

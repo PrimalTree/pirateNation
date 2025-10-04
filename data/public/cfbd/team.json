@@ -1,0 +1,12 @@
+{
+  "team": "East Carolina",
+  "season": 2025,
+  "stats": {
+    "pointsPerGame": null,
+    "totalYardsPerGame": null,
+    "rushingYardsPerGame": 200,
+    "passingYardsPerGame": 1575,
+    "thirdDownConversionPct": null,
+    "turnovers": 5
+  }
+}

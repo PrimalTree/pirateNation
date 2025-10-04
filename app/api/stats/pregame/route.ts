@@ -6,6 +6,8 @@ import {
   fetchEspnTeamSchedule,
   normalizeEspnTeamSchedule,
 } from '@pirate-nation/fetcher';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 declare const process: NodeJS.Process;
 
 const ECU_NAME = process.env.TEAM_NAME?.toLowerCase() || 'east carolina';
@@ -108,6 +110,50 @@ export async function GET() {
         gameName: current?.name ?? null,
         weather: null, // ESPN weather logic can be added if needed
       };
+
+      // Fallback: if ESPN yielded nothing useful, derive from static schedule.json
+      const emptyLike = !body.kickoff && !body.venue && !body.broadcast && !body.opponent;
+      if (emptyLike) {
+        try {
+          const schedulePath = path.join(process.cwd(), 'data', 'public', 'schedule.json');
+          const raw = await fs.readFile(schedulePath, 'utf-8');
+          const json = JSON.parse(raw) as { games?: Array<any> };
+          const games = Array.isArray(json?.games) ? json.games : [];
+          // Pick the next upcoming game; if none, last game
+          const withTs = games
+            .filter((g) => !!g.when)
+            .map((g) => ({ g, ts: new Date(g.when as string).getTime() }))
+            .filter(({ ts }) => Number.isFinite(ts));
+          const upcoming = withTs.filter(({ ts }) => ts >= now).sort((a, b) => a.ts - b.ts)[0]?.g;
+          const chosen = upcoming || withTs.sort((a, b) => a.ts - b.ts)[withTs.length - 1]?.g;
+          if (chosen) {
+            const name: string = String(chosen.name || '');
+            const when: string | null = chosen.when || null;
+            const broadcast2: string | null = chosen.broadcast || null;
+            const venue2: string | null = chosen.venue || null;
+            // Derive opponent by parsing name: "Team A at Team B" or "Team A vs Team B"
+            let opponent2: string | undefined;
+            const parts = name.split(/\s+(at|vs\.?|vs)\s+/i);
+            if (parts.length >= 3) {
+              const left = parts[0];
+              const right = parts.slice(2).join(' ');
+              const isLeftEcu = left.toLowerCase().includes(ECU_NAME) || left.toUpperCase() === 'ECU';
+              const isRightEcu = right.toLowerCase().includes(ECU_NAME) || right.toUpperCase() === 'ECU';
+              opponent2 = isLeftEcu ? right : isRightEcu ? left : undefined;
+            }
+            body = {
+              opponent: opponent2 ?? body.opponent ?? null,
+              kickoff: when ?? body.kickoff ?? null,
+              venue: venue2 ?? body.venue ?? null,
+              broadcast: broadcast2 ?? body.broadcast ?? null,
+              status: body.status ?? null,
+              teams: body.teams ?? null,
+              gameName: name || body.gameName || null,
+              weather: null,
+            };
+          }
+        } catch {}
+      }
     }
 
     cache = { data: body, ts: now };

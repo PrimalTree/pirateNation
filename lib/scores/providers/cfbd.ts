@@ -1,4 +1,4 @@
-import { RawGame } from '../types';
+import { RawGame } from '../types.js';
 
 function getWeek(date: Date, dowOffset: number) {
   dowOffset = typeof dowOffset == 'number' ? dowOffset : 0;
@@ -110,9 +110,92 @@ export function cfbdProvider(apiKey: string, weatherKey?: string) {
     };
   }
 
+  async function getTeamGames(team: string, year?: number) {
+    const y = year || new Date().getFullYear();
+    const url = new URL(`${BASE_URL}/games`);
+    url.searchParams.append('year', String(y));
+    url.searchParams.append('seasonType', 'regular');
+    url.searchParams.append('team', team);
+    const res = await fetch(url.toString(), {
+      headers: { Authorization: AUTH_HEADER },
+      cache: 'no-store',
+    });
+    if (!res.ok) throw new Error(`CFBD games error: ${res.status}`);
+    const games = await res.json();
+    return Array.isArray(games) ? games : [];
+  }
+
+  async function getTeamStats(team: string, year?: number) {
+    const y = year || new Date().getFullYear();
+    const url = new URL(`${BASE_URL}/stats/season`);
+    url.searchParams.append('year', String(y));
+    url.searchParams.append('team', team);
+    // Best effort: prefer non-garbage time if supported
+    url.searchParams.append('excludeGarbageTime', 'true');
+
+    try {
+      const res = await fetch(url.toString(), {
+        headers: { Authorization: AUTH_HEADER },
+        cache: 'no-store',
+      });
+      if (!res.ok) throw new Error(`CFBD team stats error: ${res.status}`);
+      const arr = await res.json();
+      // Response shape can vary; fold into a flat map of statName -> value
+      const flat: Record<string, number> = {} as any;
+      const pushStat = (k: any, v: any) => {
+        const key = String(k || '').toLowerCase();
+        const num = Number(v);
+        if (!key) return;
+        if (!Number.isFinite(num)) return;
+        flat[key] = num;
+      };
+      if (Array.isArray(arr)) {
+        for (const row of arr) {
+          // Common shapes observed:
+          // { team, statName, statValue }
+          // or nested by categories
+          if (row && typeof row === 'object') {
+            const name = (row.statName ?? row.stat_name ?? row.name) as any;
+            const value = (row.statValue ?? row.stat_value ?? row.value) as any;
+            if (name != null && value != null) pushStat(name, value);
+            // Some endpoints return arrays of stats per row.stats
+            const stats = Array.isArray(row.stats) ? row.stats : [];
+            for (const s of stats) {
+              pushStat(s?.statName ?? s?.name, s?.statValue ?? s?.value);
+            }
+          }
+        }
+      }
+
+      // Map into our normalized fields
+      const get = (keys: string[]) => {
+        for (const k of keys) {
+          const v = flat[k.toLowerCase()];
+          if (typeof v === 'number' && Number.isFinite(v)) return v;
+        }
+        // try find by includes
+        const foundKey = Object.keys(flat).find((kk) => keys.some((k) => kk.includes(k.toLowerCase())));
+        return foundKey ? flat[foundKey] : null;
+      };
+
+      return {
+        pointsPerGame: get(['pointspergame', 'ppg']),
+        totalYardsPerGame: get(['totalyardspergame', 'yardspergame', 'totaloffense']),
+        rushingYardsPerGame: get(['rushingyardspergame', 'rushyardspergame', 'rushing']),
+        passingYardsPerGame: get(['passingyardspergame', 'passyardspergame', 'passing']),
+        thirdDownConversionPct: get(['thirddownconversionpct', 'thirdDownEff', 'thirdDownPercentage']),
+        turnovers: get(['turnovers']),
+      };
+    } catch (e) {
+      return {};
+    }
+  }
+
   return {
     getGamesByDate,
     getPregame,
+    getTeamGames,
+    getTeamStats,
   };
 }
 

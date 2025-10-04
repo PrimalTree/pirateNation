@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { shortTeam } from './teamName';
 
 type Pregame = {
   opponent?: string | null;
@@ -7,6 +8,8 @@ type Pregame = {
   venue?: string | null;
   broadcast?: string | null;
   status?: string | null;
+  gameName?: string | null;
+  teams?: Array<{ name?: string | null; homeAway?: string | null }> | null;
   weather?: {
     temp_f?: number | null;
     description?: string | null;
@@ -37,6 +40,21 @@ export function PregameInfo() {
 
   const kickoffText = data?.kickoff ? new Date(data.kickoff).toLocaleString() : 'TBD';
 
+  const opponentShort = useMemo(() => {
+    const val = (data?.opponent || '').trim();
+    if (val) return shortTeam(val);
+    try {
+      const teams = Array.isArray(data?.teams) ? (data?.teams as any[]) : [];
+      const ecuIndex = teams.findIndex((t: any) => {
+        const n = String(t?.name || '').toLowerCase();
+        return n.includes('east carolina') || n.split(/[^a-z]/i).includes('ecu');
+      });
+      const other = teams.find((_: any, idx: number) => idx !== ecuIndex) as any;
+      if (other?.name) return shortTeam(other.name);
+    } catch {}
+    return 'TBD';
+  }, [data?.opponent, data?.teams]);
+
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
       <div className="mb-1 flex items-center justify-between">
@@ -52,7 +70,7 @@ export function PregameInfo() {
           {/* Opponent */}
           <div>
             <div className="text-zinc-400">Opponent</div>
-            <div className="text-zinc-200">{data?.opponent ?? 'TBD'}</div>
+            <div className="text-zinc-200">{opponentShort}</div>
           </div>
           {/* Kickoff */}
           <div>
