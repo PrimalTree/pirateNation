@@ -184,10 +184,11 @@ Env (server‑side only):
 
 Run locally: `pnpm poller`
 
-### Vercel Cron (optional)
+### Vercel Cron (daily backfill)
 
-- On Hobby, daily only. For live updates, prefer a dedicated poller worker.
-- Route: `app/api/cron/live/route.ts` (runtime: nodejs) remains available for manual/admin triggers.
+- Hobby plan fires a single daily hit to `/api/cron/live` (see `vercel.json` `crons`).
+- Use it for manual catch-up/backfill; sub-minute cadence comes from the poller worker.
+- Route: `app/api/cron/live/route.ts` (runtime: nodejs) shares the same sync helper as the worker.
 
 Set these envs in Vercel if you keep the cron/manual trigger:
 
@@ -196,10 +197,11 @@ Set these envs in Vercel if you keep the cron/manual trigger:
 - `LIVE_SOURCE_URL` (optional)
 - `CRON_SECRET` (required for the cron endpoint)
 
-If you need 30s or tighter cadence, run `cron/fetchLiveScores.js` on an external worker and remove the Vercel cron.
+For tight cadences, deploy the containerised worker instead (`Dockerfile.poller`, `docker-compose.poller.yml`).
 
-### Dedicated Poller Worker (Option C)
+### Dedicated Poller Worker (primary)
 
+- Runs the shared `syncLiveScores` loop on ~30s cadence outside Vercel; recommended for production live updates.
 - Use `Dockerfile.poller` to build a tiny worker container and run it on your platform of choice (Fly/Render/Railway/K8s/VM).
 - Or see `docker-compose.poller.yml` for a one‑service compose.
 - Env required:

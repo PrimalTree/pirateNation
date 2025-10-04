@@ -2,6 +2,7 @@ Dedicated Poller Worker (Option C)
 =================================
 
 This worker polls a live source on an interval and upserts results into Supabase (`public.live_games`). It’s designed to run outside Vercel so you can achieve sub‑minute cadence reliably.
+> Note: Vercel Hobby cron now runs once per day (see `vercel.json`). Use this worker for anything more frequent.
 
 Requirements
 - Node 20+ runtime (or Docker)

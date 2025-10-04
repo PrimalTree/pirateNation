@@ -1,7 +1,6 @@
 /* @ts-nocheck */
 // Edge-compatible ESPN fetcher and normalizer
 import { z } from 'zod';
-
 export const EspnEventSchema = z.object({
   id: z.string(),
   name: z.string().optional(),
@@ -22,11 +21,9 @@ export const EspnEventSchema = z.object({
     }).partial()).optional()
   }).partial()).optional()
 });
-
 export const EspnScoreboardSchema = z.object({
   events: z.array(EspnEventSchema)
 });
-
 export type NormalizedGame = {
   provider: 'espn';
   provider_id: string;
@@ -35,7 +32,6 @@ export type NormalizedGame = {
   settings: Record<string, unknown>;
   hash: string;
 };
-
 export function hashString(input: string): string {
   // Simple non-crypto hash suitable for change detection; edge-compatible
   let h = 0;
@@ -45,13 +41,11 @@ export function hashString(input: string): string {
   }
   return (h >>> 0).toString(16);
 }
-
 export function hexToUuidLike(hex: string): string {
   // Expand/normalize to 32 chars
   const s = (hex + '0'.repeat(32)).slice(0, 32);
   return `${s.slice(0, 8)}-${s.slice(8, 12)}-${s.slice(12, 16)}-${s.slice(16, 20)}-${s.slice(20, 32)}`;
 }
-
 export function normalizeEspnEvent(evt: z.infer<typeof EspnEventSchema>): NormalizedGame {
   const title = evt.name || evt.shortName || `ESPN Event ${evt.id}`;
   const comp = evt.competitions?.[0];
@@ -64,7 +58,6 @@ export function normalizeEspnEvent(evt: z.infer<typeof EspnEventSchema>): Normal
     score: c.score,
     homeAway: c.homeAway
   }));
-
   const settings = {
     provider: 'espn',
     provider_id: evt.id,
@@ -74,10 +67,8 @@ export function normalizeEspnEvent(evt: z.infer<typeof EspnEventSchema>): Normal
     status: evt.status?.type?.state,
     raw_competition_id: comp?.id
   } as Record<string, unknown>;
-
   const payloadForHash = JSON.stringify({ title, when: evt.date, settings });
   const hash = hashString(payloadForHash);
-
   return {
     provider: 'espn',
     provider_id: evt.id,
@@ -87,7 +78,6 @@ export function normalizeEspnEvent(evt: z.infer<typeof EspnEventSchema>): Normal
     hash
   };
 }
-
 export function normalizeEspnScoreboard(json: unknown): NormalizedGame[] {
   const ECU_TEAM_ID = '151';
   const parsed = EspnScoreboardSchema.parse(json);
@@ -98,11 +88,22 @@ export function normalizeEspnScoreboard(json: unknown): NormalizedGame[] {
     })
     .map((evt) => normalizeEspnEvent(evt));
 }
-
-export async function fetchEspnScoreboard(url?: string): Promise<unknown> {
-  const target = url ?? 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard';
+export type FetchEspnScoreboardInput = string | {
+  url?: string;
+  headers?: Record<string, string>;
+};
+export async function fetchEspnScoreboard(input?: FetchEspnScoreboardInput): Promise<unknown> {
+  let target: string | undefined;
+  let headers: Record<string, string> | undefined;
+  if (typeof input === 'string') {
+    target = input;
+  } else if (input) {
+    target = input.url;
+    headers = input.headers;
+  }
+  const url = target ?? 'https://site.api.espn.com/apis/site/v2/sports/football/college-football/scoreboard';
   try {
-    const res = await fetch(target, { cache: 'no-store' });
+    const res = await fetch(url, { cache: 'no-store', headers });
     if (!res.ok) throw new Error(`ESPN fetch failed: ${res.status}`);
     return await res.json();
   } catch {
@@ -146,14 +147,12 @@ export const EspnTeamScheduleSchema = z.object({
     }))
   }))
 });
-
 export async function fetchEspnTeamSchedule(teamId: string): Promise<unknown> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/schedule`;
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`ESPN fetch failed: ${res.status}`);
   return await res.json();
 }
-
 export function normalizeEspnTeamSchedule(json: unknown) {
   const parsed = EspnTeamScheduleSchema.parse(json);
   return parsed.events.map(event => ({
@@ -164,7 +163,6 @@ export function normalizeEspnTeamSchedule(json: unknown) {
     broadcast: event.competitions[0].broadcasts?.[0]?.media?.shortName ?? 'TBD'
   }));
 }
-
 export const EspnTeamRosterSchema = z.object({
   athletes: z.array(z.object({
     items: z.array(z.object({
@@ -177,14 +175,12 @@ export const EspnTeamRosterSchema = z.object({
     }))
   }))
 });
-
 export async function fetchEspnTeamRoster(teamId: string): Promise<unknown> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/roster`;
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`ESPN fetch failed: ${res.status}`);
   return await res.json();
 }
-
 export function normalizeEspnTeamRoster(json: unknown) {
   const parsed = EspnTeamRosterSchema.parse(json);
   return parsed.athletes.flatMap(athleteGroup =>
@@ -196,7 +192,6 @@ export function normalizeEspnTeamRoster(json: unknown) {
     }))
   );
 }
-
 // --- Team statistics (best-effort, structure can vary) ---
 export async function fetchEspnTeamStats(teamId: string, season?: number): Promise<unknown> {
   const url = `https://site.api.espn.com/apis/site/v2/sports/football/college-football/teams/${teamId}/statistics${season ? `?season=${season}` : ''}`;
@@ -204,7 +199,6 @@ export async function fetchEspnTeamStats(teamId: string, season?: number): Promi
   if (!res.ok) throw new Error(`ESPN team stats failed: ${res.status}`);
   return await res.json();
 }
-
 export function normalizeEspnTeamStats(json: any) {
   try {
     const cats: any[] = Array.isArray(json?.statistics) ? json.statistics : [];
@@ -228,7 +222,6 @@ export function normalizeEspnTeamStats(json: any) {
     return {};
   }
 }
-
 // --- Team leaders (best-effort) ---
 export async function fetchEspnTeamLeaders(teamId: string, season?: number): Promise<unknown> {
   // Known ESPN endpoints vary; try leaders endpoint, fallback to team endpoint with leaders enabled
@@ -244,7 +237,6 @@ export async function fetchEspnTeamLeaders(teamId: string, season?: number): Pro
   }
   throw new Error('ESPN team leaders unavailable');
 }
-
 export function normalizeEspnTeamLeaders(json: any) {
   // Produce a compact map of categories => { name, value }
   const out: Record<string, { name: string; value: number | string }> = {};
