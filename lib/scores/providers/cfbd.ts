@@ -1,4 +1,4 @@
-import { RawGame } from '../types.js';
+﻿import { RawGame } from '../types.js';
 
 function getWeek(date: Date, dowOffset: number) {
   dowOffset = typeof dowOffset == 'number' ? dowOffset : 0;
@@ -75,28 +75,53 @@ export function cfbdProvider(apiKey: string, weatherKey?: string) {
         ? upcoming.home_team
         : upcoming.away_team;
 
-    // Weather: use venue city/state if present, otherwise default to Greenville
+    // Weather: use OpenWeather 16-day forecast. Try venue city/state; fallback to Greenville, NC.
     let weather: any = null;
     if (weatherKey) {
-      const city = upcoming.venue || 'Greenville';
-      const q = encodeURIComponent(`${city},NC,US`);
+      const kickoff = upcoming.start_date ? new Date(upcoming.start_date) : null;
+      const city = upcoming.venue_city || upcoming.venue || 'Greenville';
+      const state = upcoming.venue_state || 'NC';
+      const query = encodeURIComponent(`${city},${state},US`);
+      const forecastUrl = new URL('https://api.openweathermap.org/data/2.5/forecast/daily');
+      forecastUrl.searchParams.set('q', query);
+      forecastUrl.searchParams.set('cnt', '16');
+      forecastUrl.searchParams.set('units', 'imperial');
+      forecastUrl.searchParams.set('appid', weatherKey);
       try {
-        const wres = await fetch(
-          `https://api.openweathermap.org/data/2.5/weather?units=imperial&q=${q}&appid=${weatherKey}`,
-          { cache: 'no-store' }
-        );
+        const wres = await fetch(forecastUrl.toString(), { cache: 'no-store' });
         if (wres.ok) {
           const wjson = await wres.json();
-          weather = {
-            temp_f: wjson?.main?.temp ?? null,
-            description: wjson?.weather?.[0]?.description ?? null,
-            icon: wjson?.weather?.[0]?.icon ?? null,
-            wind_mph: wjson?.wind?.speed ?? null,
-            humidity: wjson?.main?.humidity ?? null,
-          };
+          const list = Array.isArray(wjson?.list) ? wjson.list : [];
+          let match = list[0];
+          if (kickoff) {
+            const kickoffTs = kickoff.getTime();
+            const candidates: Array<{ entry: any; ts: number }> = [];
+            for (const entry of list as any[]) {
+              const ts = typeof entry?.dt === 'number' ? entry.dt * 1000 : NaN;
+              if (Number.isFinite(ts)) {
+                candidates.push({ entry, ts });
+              }
+            }
+            candidates.sort((a, b) => Math.abs(a.ts - kickoffTs) - Math.abs(b.ts - kickoffTs));
+            match = candidates[0]?.entry ?? match;
+          }
+          if (match) {
+            const icon = match?.weather?.[0]?.icon ?? null;
+            const description = match?.weather?.[0]?.description ?? null;
+            const tempDay = match?.temp?.day ?? match?.temp?.eve ?? null;
+            const wind = match?.speed ?? match?.wind_speed ?? null;
+            const humidity = match?.humidity ?? null;
+            weather = {
+              temp_f: typeof tempDay === 'number' ? tempDay : null,
+              description,
+              icon,
+              wind_mph: typeof wind === 'number' ? wind : null,
+              humidity: typeof humidity === 'number' ? humidity : null,
+            };
+          }
         }
       } catch (e) {
-        console.error('Weather fetch failed:', e);
+        console.error('Weather forecast fetch failed:', e);
       }
     }
 
@@ -198,4 +223,5 @@ export function cfbdProvider(apiKey: string, weatherKey?: string) {
     getTeamStats,
   };
 }
+
 

@@ -1,3 +1,4 @@
+// app/api/stats/pregame/route.ts
 import { NextResponse } from 'next/server';
 import { cfbdProvider } from '../../../../lib/scores/providers/cfbd';
 import {
@@ -6,6 +7,7 @@ import {
   fetchEspnTeamSchedule,
   normalizeEspnTeamSchedule,
 } from '@pirate-nation/fetcher';
+import { getForecastForDate } from 'lib/weather/openweather';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 declare const process: NodeJS.Process;
@@ -31,48 +33,68 @@ export async function GET() {
         process.env.CFBD_API_KEY!,
         process.env.OPENWEATHER_API_KEY
       );
+      // If your cfbdProvider.getPregame already returns weather, great.
+      // If not, we’ll add it below.
       body = await provider.getPregame(process.env.TEAM_NAME || 'East Carolina');
+
+      // Attach weather if missing
+      if (!body?.weather) {
+        const kickoffISO: string | null = body?.kickoff ?? null;
+        const venueCity: string | null = body?.venueCity ?? null; // if your provider sets it
+        const venueState: string | null = body?.venueState ?? null;
+
+        const w = await getForecastForDate({
+          apiKey: process.env.OPENWEATHER_API_KEY || '',
+          city: venueCity || undefined,
+          state: venueState || undefined,
+          country: 'US',
+          fallbackCity: 'Greenville',
+          fallbackState: 'NC',
+          targetISO: kickoffISO,
+        });
+
+        body.weather = {
+          temp_f: w.temp_f ?? null,
+          description: w.description ?? null,
+          icon: w.icon ?? null,
+          wind_mph: w.wind_mph ?? null,
+          humidity: w.humidity ?? null,
+          source: w.source,
+        };
+      }
     } else {
-      // ---- ESPN logic (unchanged from your version) ----
+      // ---- ESPN logic (your base, with weather added) ----
       const sbRaw = await fetchEspnScoreboard();
       let schedRaw: unknown | null = null;
-      try {
-        schedRaw = await fetchEspnTeamSchedule(ECU_TEAM_ID);
-      } catch {}
+      try { schedRaw = await fetchEspnTeamSchedule(ECU_TEAM_ID); } catch {}
 
       const events = normalizeEspnScoreboard(sbRaw).filter((g) => {
         try {
           const name = (g?.name ?? '').toString().toLowerCase();
           const teams: any[] | undefined = (g?.settings as any)?.teams;
-          const teamHit =
-            Array.isArray(teams) &&
-            teams.some(
-              (t) =>
-                String(t?.name ?? '').toLowerCase().includes(ECU_NAME) ||
-                String(t?.name ?? '').toUpperCase() === 'ECU'
+          const teamHit = Array.isArray(teams) &&
+            teams.some((t) =>
+              String(t?.name ?? '').toLowerCase().includes(ECU_NAME) ||
+              String(t?.name ?? '').toUpperCase() === 'ECU'
             );
-          const nameHit =
-            name.includes(ECU_NAME) || name.split(/[^a-z]/i).includes('ecu');
+          const nameHit = name.includes(ECU_NAME) || name.split(/[^a-z]/i).includes('ecu');
           return teamHit || nameHit;
-        } catch {
-          return false;
-        }
+        } catch { return false; }
       });
 
       const current =
         events.find((g) =>
-          String((g?.settings as any)?.status ?? '')
-            .toLowerCase()
-            .includes('live')
+          String((g?.settings as any)?.status ?? '').toLowerCase().includes('live')
         ) ||
-        events.find((g) =>
-          g.when ? new Date(g.when as string).getTime() >= now : false
-        ) ||
+        events.find((g) => g.when ? new Date(g.when as string).getTime() >= now : false) ||
         events[events.length - 1];
 
       const sched = schedRaw ? normalizeEspnTeamSchedule(schedRaw) : [];
       let broadcast: string | undefined;
       let venue: string | undefined;
+      let venueCity: string | undefined;
+      let venueState: string | undefined;
+
       if (current?.when) {
         const target = new Date(current.when as string).getTime();
         let nearest = { diff: Infinity, item: null as any };
@@ -84,6 +106,9 @@ export async function GET() {
         if (nearest.item) {
           broadcast = nearest.item.broadcast;
           venue = nearest.item.venue;
+          // If your normalize adds city/state, pick them here if available
+          venueCity = nearest.item.venueCity || undefined;
+          venueState = nearest.item.venueState || undefined;
         }
       }
 
@@ -100,6 +125,18 @@ export async function GET() {
         opponent = other?.name ?? undefined;
       } catch {}
 
+      // Weather for kickoff day (Greenville, NC fallback)
+      const kickoffISO: string | null = current?.when ?? null;
+      const w = await getForecastForDate({
+        apiKey: process.env.OPENWEATHER_API_KEY || '',
+        city: venueCity || undefined,
+        state: venueState || undefined,
+        country: 'US',
+        fallbackCity: 'Greenville',
+        fallbackState: 'NC',
+        targetISO: kickoffISO,
+      });
+
       body = {
         opponent,
         kickoff: current?.when ?? null,
@@ -108,10 +145,17 @@ export async function GET() {
         status: (current as any)?.settings?.status ?? null,
         teams: (current as any)?.settings?.teams ?? null,
         gameName: current?.name ?? null,
-        weather: null, // ESPN weather logic can be added if needed
+        weather: {
+          temp_f: w.temp_f ?? null,
+          description: w.description ?? null,
+          icon: w.icon ?? null,
+          wind_mph: w.wind_mph ?? null,
+          humidity: w.humidity ?? null,
+          source: w.source,
+        },
       };
 
-      // Fallback: if ESPN yielded nothing useful, derive from static schedule.json
+      // Fallback from static schedule.json if ESPN empty
       const emptyLike = !body.kickoff && !body.venue && !body.broadcast && !body.opponent;
       if (emptyLike) {
         try {
@@ -119,7 +163,6 @@ export async function GET() {
           const raw = await fs.readFile(schedulePath, 'utf-8');
           const json = JSON.parse(raw) as { games?: Array<any> };
           const games = Array.isArray(json?.games) ? json.games : [];
-          // Pick the next upcoming game; if none, last game
           const withTs = games
             .filter((g) => !!g.when)
             .map((g) => ({ g, ts: new Date(g.when as string).getTime() }))
@@ -131,6 +174,7 @@ export async function GET() {
             const when: string | null = chosen.when || null;
             const broadcast2: string | null = chosen.broadcast || null;
             const venue2: string | null = chosen.venue || null;
+
             // Derive opponent by parsing name: "Team A at Team B" or "Team A vs Team B"
             let opponent2: string | undefined;
             const parts = name.split(/\s+(at|vs\.?|vs)\s+/i);
@@ -141,6 +185,15 @@ export async function GET() {
               const isRightEcu = right.toLowerCase().includes(ECU_NAME) || right.toUpperCase() === 'ECU';
               opponent2 = isLeftEcu ? right : isRightEcu ? left : undefined;
             }
+
+            // Weather again, using fallback only (Greenville) since schedule.json usually lacks city/state
+            const w2 = await getForecastForDate({
+              apiKey: process.env.OPENWEATHER_API_KEY || '',
+              fallbackCity: 'Greenville',
+              fallbackState: 'NC',
+              targetISO: when,
+            });
+
             body = {
               opponent: opponent2 ?? body.opponent ?? null,
               kickoff: when ?? body.kickoff ?? null,
@@ -149,7 +202,14 @@ export async function GET() {
               status: body.status ?? null,
               teams: body.teams ?? null,
               gameName: name || body.gameName || null,
-              weather: null,
+              weather: {
+                temp_f: w2.temp_f ?? null,
+                description: w2.description ?? null,
+                icon: w2.icon ?? null,
+                wind_mph: w2.wind_mph ?? null,
+                humidity: w2.humidity ?? null,
+                source: w2.source,
+              },
             };
           }
         } catch {}
@@ -162,4 +222,3 @@ export async function GET() {
     return NextResponse.json({ error: 'failed' }, { status: 500 });
   }
 }
-

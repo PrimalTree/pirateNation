@@ -89,7 +89,7 @@ export function PregameInfo() {
           </div>
           {/* Weather */}
           <div className="md:col-span-3">
-            <div className="text-zinc-400">Weather</div>
+            <div className="text-zinc-400">Expected Weather</div>
             {data?.weather ? (
               <div className="mt-1 flex items-center gap-3">
                 {data.weather.icon ? (

@@ -15,11 +15,12 @@ export const metadata = {
 export default function PublicLayout({ children }: { children: React.ReactNode }) {
   return (
     <div>
+      <AnnouncementsBar />
       <div>
         <TopBar />
       </div>
       <SponsorBanner />
-      <AnnouncementsBar />
+      
       <main className="mx-auto max-w-6xl p-6">{children}</main>
       <Footer />
       {/* Spacer so footer isn't hidden behind fixed BottomNav on small screens */}
