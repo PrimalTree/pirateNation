@@ -16,6 +16,7 @@ type Pregame = {
     icon?: string | null;
     wind_mph?: number | null;
     humidity?: number | null;
+    at?: string | null;
   } | null;
 };
 
@@ -54,6 +55,23 @@ export function PregameInfo() {
     } catch {}
     return 'TBD';
   }, [data?.opponent, data?.teams]);
+
+  const weatherDate = useMemo(() => {
+    const at = data?.weather?.at || data?.kickoff || null;
+    if (!at) return null;
+    const d = new Date(at);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }, [data?.weather?.at, data?.kickoff]);
+
+  const weatherMeta = useMemo(() => {
+    if (!data?.weather) return '';
+    const segments: string[] = [];
+    const wind = data.weather.wind_mph;
+    if (typeof wind === 'number') segments.push(`Wind ${Math.round(wind)} mph`);
+    const humidity = data.weather.humidity;
+    if (typeof humidity === 'number') segments.push(`Humidity ${humidity}%`);
+    return segments.join(' | ');
+  }, [data?.weather?.wind_mph, data?.weather?.humidity, data?.weather]);
 
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
@@ -102,15 +120,15 @@ export function PregameInfo() {
                 ) : null}
                 <div className="text-zinc-200">
                   <span className="text-lg font-semibold text-ecu-gold">
-                    {typeof data.weather.temp_f === 'number' ? Math.round(data.weather.temp_f) + '°F' : '—'}
+                    {typeof data.weather.temp_f === 'number' ? `${Math.round(data.weather.temp_f)}°F` : '—'}
                   </span>
                   {data.weather.description ? (
                     <span className="ml-2 capitalize text-zinc-300">{String(data.weather.description)}</span>
                   ) : null}
-                  <div className="text-xs text-zinc-400">
-                    {typeof data.weather.wind_mph === 'number' ? `Wind ${Math.round(data.weather.wind_mph)} mph` : ''}
-                    {typeof data.weather.humidity === 'number' ? `${typeof data.weather.wind_mph === 'number' ? ' • ' : ''}Humidity ${data.weather.humidity}%` : ''}
-                  </div>
+                  
+                  {weatherMeta ? (
+                    <div className="text-xs text-zinc-400">{weatherMeta}</div>
+                  ) : null}
                 </div>
               </div>
             ) : (

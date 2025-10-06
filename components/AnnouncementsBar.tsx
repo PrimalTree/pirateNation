@@ -59,8 +59,8 @@ export function AnnouncementsBar() {
       : 'border-ecu-purple/40 bg-black/60 text-zinc-200';
 
   const content = (
-    <div className="mx-auto max-w-6xl truncate px-4 py-2 text-sm">
-      {current.text}
+    <div className="mx-auto flex max-w-6xl items-center justify-center px-4 py-2 text-sm text-center">
+      <span className="block truncate">{current.text}</span>
     </div>
   );
 

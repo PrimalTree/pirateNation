@@ -111,12 +111,15 @@ export function cfbdProvider(apiKey: string, weatherKey?: string) {
             const tempDay = match?.temp?.day ?? match?.temp?.eve ?? null;
             const wind = match?.speed ?? match?.wind_speed ?? null;
             const humidity = match?.humidity ?? null;
+            const matchTs = typeof match?.dt === 'number' ? match.dt * 1000 : null;
+            const atTs = matchTs ?? (kickoff ? kickoff.getTime() : null);
             weather = {
               temp_f: typeof tempDay === 'number' ? tempDay : null,
               description,
               icon,
               wind_mph: typeof wind === 'number' ? wind : null,
               humidity: typeof humidity === 'number' ? humidity : null,
+              at: typeof atTs === 'number' ? new Date(atTs).toISOString() : null,
             };
           }
         }
@@ -223,5 +226,3 @@ export function cfbdProvider(apiKey: string, weatherKey?: string) {
     getTeamStats,
   };
 }
-
-

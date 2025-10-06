@@ -3,7 +3,7 @@ import React from 'react';
 
 export const metadata = {
   title: 'Purple Armada Web',
-  description: 'Web app stub',
+  description: 'ECU Football Fan Engagement App',
   icons: {
     icon: [
       { url: '/icons/icon-192.svg', sizes: '192x192', type: 'image/svg+xml' },
