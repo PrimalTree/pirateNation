@@ -1,157 +1,159 @@
 "use client";
-import { useEffect, useMemo, useState } from 'react';
-import { shortTeam } from './teamName';
+import { useEffect, useState } from "react";
 
-type TeamStatsShape = {
-  pointsPerGame?: number | null;
-  totalYardsPerGame?: number | null;
-  rushingYardsPerGame?: number | null;
-  passingYardsPerGame?: number | null;
-  thirdDownConversionPct?: number | null;
-  turnovers?: number | null;
+type Leader = { name: string; value: number };
+type TeamBlock = {
+  team: string;
+  perGame: {
+    pointsPerGame?: number;
+    pointsAgainstPerGame?: number;
+    passYdsPerGame?: number;
+    rushYdsPerGame?: number;
+    totalOffensePerGame?: number;
+    totalDefensePerGame?: number;
+    thirdDownPct?: number;
+    redZonePct?: number;
+    turnoverMargin?: number;
+    penaltiesPerGame?: number;
+    penaltyYdsPerGame?: number;
+  };
+  leaders: {
+    passing?: Leader;
+    rushing?: Leader;
+    receiving?: Leader;
+    tackles?: Leader;
+    interceptions?: Leader;
+  };
+};
+
+type GamedayPayload = {
+  team: TeamBlock;
+  opponent?: TeamBlock;
+  inferredOpponent?: string;
 };
 
 export function TeamStats() {
-  const [ours, setOurs] = useState<TeamStatsShape | null>(null);
-  const [opp, setOpp] = useState<TeamStatsShape | null>(null);
-  const [oppLabel, setOppLabel] = useState<string>('Opponent');
-  const [oppHasInfo, setOppHasInfo] = useState<boolean>(false);
-  const [oppKey, setOppKey] = useState<string>('');
-  const [tab, setTab] = useState<'ours' | 'opp'>('ours');
+  const [data, setData] = useState<GamedayPayload | null>(null);
+  const [tab, setTab] = useState<"team" | "opp">("team");
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        // 1) Always fetch our stats
-        const oursRes = await fetch('/api/stats/team', { cache: 'no-store' });
-        const oursBody = await oursRes.json();
-        if (alive) setOurs(oursBody);
-
-        // 2) Try to find opponent from pregame
-        const preRes = await fetch('/api/stats/pregame', { cache: 'no-store' });
-        const pre = await preRes.json();
-        const teams: Array<any> = Array.isArray(pre?.teams) ? pre.teams : [];
-
-        // Determine opponent: the team that is NOT ECU (by name includes 'east carolina' or equals 'ECU')
-        const findEcu = (n?: string) => {
-          const t = String(n || '').toLowerCase();
-          return t.includes('east carolina') || t.split(/[^a-z]/i).includes('ecu');
-        };
-        // Prefer explicit opponent field when present
-        const fromField = (pre?.opponent && String(pre.opponent).trim()) || '';
-        if (alive && fromField) {
-          setOppLabel(shortTeam(fromField));
-          setOppKey(fromField);
-        }
-
-        const ecuTeam = teams.find((t) => findEcu(t?.name));
-        const otherTeam = teams.find((t) => !findEcu(t?.name));
-        const oppCandidateName = otherTeam?.name ? String(otherTeam.name) : '';
-        if (alive && !fromField && oppCandidateName) {
-          setOppLabel(shortTeam(oppCandidateName));
-          setOppKey(oppCandidateName);
-        }
-        if (alive) setOppHasInfo(Boolean(fromField || oppCandidateName));
-
-        const oppIdRaw = otherTeam?.id ? String(otherTeam.id) : '';
-        const isNumericId = /^\d+$/.test(oppIdRaw);
-        const nameForLookup = fromField || otherTeam?.name || '';
-        if (alive && !oppKey) setOppKey(isNumericId ? oppIdRaw : nameForLookup);
-
-        // If no teams in pregame, try scoreboard to get teams/ids
-        if (!teams.length) {
-          try {
-            const sb = await fetch('/api/scoreboard', { cache: 'no-store' });
-            const list = await sb.json();
-            const first = Array.isArray(list) ? list[0] : null;
-            const tms: Array<any> = first?.settings?.teams || [];
-            const other = tms.find((t: any) => !findEcu(t?.name));
-            const nmRaw = other?.name ? String(other.name) : '';
-            const nm = nmRaw ? shortTeam(nmRaw) : '';
-            if (alive && nm && oppLabel === 'Opponent') setOppLabel(nm);
-            if (alive && nmRaw && !oppKey) setOppKey(nmRaw);
-            if (alive && !oppHasInfo && nm) setOppHasInfo(true);
-          } catch {}
+        const res = await fetch("/api/stats/gameday", { cache: "no-store" });
+        if (!res.ok) throw new Error(await res.text());
+        const j = await res.json();
+        if (alive) {
+          setData({
+            team: j.team,
+            opponent: j.opponent ?? undefined,
+            inferredOpponent: j.inferredOpponent ?? undefined,
+          });
         }
       } catch (e: any) {
-        if (alive) setError(e?.message || 'Failed to load team stats');
+        if (alive) setError(e?.message || "Failed to load team stats");
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
-  // Fetch opponent stats when opponent key is known/changes
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const key = (oppKey || '').trim();
-        if (!key) return;
-        const res = await fetch(`/api/stats/team/${encodeURIComponent(key)}`, { cache: 'no-store' });
-        const body = await res.json();
-        if (alive) setOpp(body);
-      } catch {}
-    })();
-    return () => { alive = false; };
-  }, [oppKey]);
+  const fmt = (n?: number) => (typeof n === "number" && Number.isFinite(n) ? n.toFixed(1) : "");
 
-  const fmt = (n?: number | null) => (typeof n === 'number' && isFinite(n) ? n.toFixed(1) : '—');
-  const empty = (s: TeamStatsShape | null) => !s || Object.values(s).every((v) => v == null);
-  const data: TeamStatsShape | null = tab === 'opp' ? opp : ours;
-  const hasOpp = oppHasInfo || !!opp;
+  if (error) {
+    return (
+      <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
+        <h3 className="mb-2 text-sm font-semibold">Team Stats</h3>
+        <div className="text-sm text-red-400">{error}</div>
+      </section>
+    );
+  }
+  if (!data) return null;
+
+  const block = tab === "team" ? data.team : data.opponent ?? data.team;
+  const pg = block.perGame || {};
+  const oppLabel = data.opponent?.team || data.inferredOpponent || "Opponent";
+  const canViewOpp = Boolean(data.opponent);
 
   return (
     <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
       <div className="mb-2 flex items-center justify-between">
         <h3 className="text-sm font-semibold">Team Stats</h3>
-        <div className="shrink-0 inline-flex gap-1 rounded-lg border border-zinc-800 bg-zinc-950 p-0.5">
+        <div className="inline-flex shrink-0 gap-1 rounded-lg border border-zinc-800 bg-zinc-950 p-0.5">
           <button
             type="button"
-            onClick={() => setTab('ours')}
-            className={`px-2 py-1 text-xs rounded-md ${tab === 'ours' ? 'bg-ecu-gold text-black' : 'text-zinc-300 hover:text-white'}`}
-          >ECU</button>
+            onClick={() => setTab("team")}
+            className={`px-2 py-1 text-xs rounded-md ${
+              tab === "team" ? "bg-ecu-gold text-black" : "text-zinc-300 hover:text-white"
+            }`}
+          >
+            {data.team.team}
+          </button>
           <button
             type="button"
-            onClick={() => setTab('opp')}
-            className={`px-2 py-1 text-xs rounded-md ${tab === 'opp' ? 'bg-ecu-gold text-black' : 'text-zinc-300 hover:text-white'}`}
-            title={oppLabel}
-          >{oppLabel}</button>
+            onClick={() => setTab("opp")}
+            className={`px-2 py-1 text-xs rounded-md ${
+              tab === "opp" ? "bg-ecu-gold text-black" : "text-zinc-300 hover:text-white"
+            } ${!canViewOpp ? "opacity-40 cursor-not-allowed" : ""}`}
+            disabled={!canViewOpp}
+          >
+            {oppLabel}
+          </button>
         </div>
       </div>
-      {error ? (
-        <div className="text-sm text-red-400">{error}</div>
-      ) : empty(data) ? (
-        <div className="text-sm text-zinc-400">Stats unavailable.</div>
-      ) : (
-        <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-3">
-          <div>
-            <div className="text-zinc-400">PPG</div>
-            <div className="text-zinc-200">{fmt(data?.pointsPerGame)}</div>
-          </div>
-          <div>
-            <div className="text-zinc-400">Yards/G</div>
-            <div className="text-zinc-200">{fmt(data?.totalYardsPerGame)}</div>
-          </div>
-          <div>
-            <div className="text-zinc-400">Rush Yds/G</div>
-            <div className="text-zinc-200">{fmt(data?.rushingYardsPerGame)}</div>
-          </div>
-          <div>
-            <div className="text-zinc-400">Pass Yds/G</div>
-            <div className="text-zinc-200">{fmt(data?.passingYardsPerGame)}</div>
-          </div>
-          <div>
-            <div className="text-zinc-400">3rd Down %</div>
-            <div className="text-zinc-200">{fmt(data?.thirdDownConversionPct)}</div>
-          </div>
-          <div>
-            <div className="text-zinc-400">Turnovers</div>
-            <div className="text-zinc-200">{fmt(data?.turnovers)}</div>
-          </div>
+
+      <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-3">
+        <div>
+          <div className="text-zinc-400">Points For (PPG)</div>
+          <div className="text-zinc-200">{fmt(pg.pointsPerGame)}</div>
         </div>
-      )}
+        <div>
+          <div className="text-zinc-400">Points Against (PAPG)</div>
+          <div className="text-zinc-200">{fmt(pg.pointsAgainstPerGame)}</div>
+        </div>
+        <div>
+          <div className="text-zinc-400">Pass Yds/G</div>
+          <div className="text-zinc-200">{fmt(pg.passYdsPerGame)}</div>
+        </div>
+        <div>
+          <div className="text-zinc-400">Rush Yds/G</div>
+          <div className="text-zinc-200">{fmt(pg.rushYdsPerGame)}</div>
+        </div>
+        <div>
+          <div className="text-zinc-400">3rd Down %</div>
+          <div className="text-zinc-200">{fmt(pg.thirdDownPct)}</div>
+        </div>
+        <div>
+          <div className="text-zinc-400">TO Margin</div>
+          <div className="text-zinc-200">{fmt(pg.turnoverMargin)}</div>
+        </div>
+        {pg.totalOffensePerGame != null && (
+          <div>
+            <div className="text-zinc-400">Total Offense/G</div>
+            <div className="text-zinc-200">{fmt(pg.totalOffensePerGame)}</div>
+          </div>
+        )}
+        {pg.totalDefensePerGame != null && (
+          <div>
+            <div className="text-zinc-400">Total Defense/G (allowed)</div>
+            <div className="text-zinc-200">{fmt(pg.totalDefensePerGame)}</div>
+          </div>
+        )}
+        {pg.penaltiesPerGame != null && (
+          <div>
+            <div className="text-zinc-400">Penalties / G</div>
+            <div className="text-zinc-200">{fmt(pg.penaltiesPerGame)}</div>
+          </div>
+        )}
+        {pg.penaltyYdsPerGame != null && (
+          <div>
+            <div className="text-zinc-400">Penalty Yds / G</div>
+            <div className="text-zinc-200">{fmt(pg.penaltyYdsPerGame)}</div>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

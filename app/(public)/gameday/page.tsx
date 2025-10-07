@@ -9,7 +9,10 @@ import { shortTeam, shortMatchup, shortFinalString } from '../../../components/g
 import { StadiumMap } from '../../../components/StadiumMap';
 import { PregameInfo } from '../../../components/gameday/PregameInfo';
 import { TeamStats } from '../../../components/gameday/TeamStats';
+import { AdvancedMatchup } from '../../../components/gameday/AdvancedMatchup';
 import { PlayerLeaders } from '../../../components/gameday/PlayerLeaders';
+import TeamOpponentStats from './_components/TeamOpponentStats';
+
 
 function Glow() {
   return (
@@ -143,8 +146,9 @@ export default function Page() {
     <div className="space-y-8" suppressHydrationWarning>
       <PregameInfo />
       <div className="grid gap-4 md:grid-cols-2">
+        <TeamOpponentStats />
+        <AdvancedMatchup />
         <TeamStats />
-        <PlayerLeaders />
       </div>
       {(() => {
         const events = Array.isArray(liveGames) ? liveGames : [];
