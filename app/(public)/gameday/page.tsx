@@ -9,7 +9,6 @@ import { shortTeam, shortMatchup, shortFinalString } from '../../../components/g
 import { StadiumMap } from '../../../components/StadiumMap';
 import { PregameInfo } from '../../../components/gameday/PregameInfo';
 import { TeamStats } from '../../../components/gameday/TeamStats';
-import { AdvancedMatchup } from '../../../components/gameday/AdvancedMatchup';
 import { PlayerLeaders } from '../../../components/gameday/PlayerLeaders';
 import TeamOpponentStats from './_components/TeamOpponentStats';
 
@@ -147,9 +146,9 @@ export default function Page() {
       <PregameInfo />
       <div className="grid gap-4 md:grid-cols-2">
         <TeamOpponentStats />
-        <AdvancedMatchup />
         <TeamStats />
       </div>
+      <PlayerLeaders />
       {(() => {
         const events = Array.isArray(liveGames) ? liveGames : [];
         const isLive = (g: Game) => String(g?.settings?.status ?? '').toLowerCase().match(/live|inprogress|in-progress|in/) != null;

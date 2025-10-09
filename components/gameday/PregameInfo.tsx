@@ -24,6 +24,15 @@ type Pregame = {
   } | null;
 };
 
+type BookLine = {
+  provider: string;
+  spread: number | null;
+  total: number | null;
+  winProbability: number | null;
+  lastUpdated: string | null;
+  rawSpread: number | null;
+};
+
 type LinesResponse = {
   team: string;
   opponent: string | null;
@@ -38,13 +47,14 @@ type LinesResponse = {
   source: string;
 };
 
-type BookLine = {
-  provider: string;
-  spread: number | null;
-  total: number | null;
-  winProbability: number | null;
-  lastUpdated: string | null;
-  rawSpread: number | null;
+type MatchOddsCardProps = {
+  lines: LinesResponse | null;
+  loading: boolean;
+  error: string | null;
+};
+
+type SparklineProps = {
+  values: number[];
 };
 
 export function PregameInfo() {
@@ -52,7 +62,7 @@ export function PregameInfo() {
   const [error, setError] = useState<string | null>(null);
   const [lines, setLines] = useState<LinesResponse | null>(null);
   const [linesError, setLinesError] = useState<string | null>(null);
-  const [linesLoading, setLinesLoading] = useState<boolean>(false);
+  const [linesLoading, setLinesLoading] = useState(false);
 
   useEffect(() => {
     let alive = true;
@@ -118,7 +128,7 @@ export function PregameInfo() {
       const other = teams.find((_: any, idx: number) => idx !== ecuIndex) as any;
       if (other?.name) return shortTeam(other.name);
     } catch {
-      // ignore fallback
+      /* ignore */
     }
     return "TBD";
   }, [data?.opponent, data?.teams]);
@@ -133,12 +143,8 @@ export function PregameInfo() {
   const weatherMeta = useMemo(() => {
     if (!data?.weather) return "";
     const parts: string[] = [];
-    if (typeof data.weather.wind_mph === "number") {
-      parts.push(`Wind ${Math.round(data.weather.wind_mph)} mph`);
-    }
-    if (typeof data.weather.humidity === "number") {
-      parts.push(`Humidity ${data.weather.humidity}%`);
-    }
+    if (typeof data.weather.wind_mph === "number") parts.push(`Wind ${Math.round(data.weather.wind_mph)} mph`);
+    if (typeof data.weather.humidity === "number") parts.push(`Humidity ${data.weather.humidity}%`);
     return parts.join(" | ");
   }, [data?.weather?.wind_mph, data?.weather?.humidity, data?.weather]);
 
@@ -146,11 +152,9 @@ export function PregameInfo() {
     <section className="rounded-xl border border-zinc-800 bg-zinc-900 p-3">
       <div className="mb-1 flex items-center justify-between">
         <h3 className="text-sm font-semibold">Pregame</h3>
-        {data?.status && (
-          <span className="rounded border border-emerald-400/40 px-1.5 py-0.5 text-[10px] text-emerald-200">
-            {String(data.status)}
-          </span>
-        )}
+        {data?.status ? (
+          <span className="rounded border border-emerald-400/40 px-1.5 py-0.5 text-[10px] text-emerald-200">{String(data.status)}</span>
+        ) : null}
       </div>
       {error ? (
         <div className="text-sm text-red-400">{error}</div>
@@ -186,9 +190,7 @@ export function PregameInfo() {
                   ) : null}
                   <div className="text-zinc-200">
                     <span className="text-lg font-semibold text-ecu-gold">
-                      {typeof data.weather.temp_f === "number"
-                        ? `${Math.round(data.weather.temp_f)}${String.fromCharCode(176)}F`
-                        : "--"}
+                      {typeof data.weather.temp_f === "number" ? `${Math.round(data.weather.temp_f)}${String.fromCharCode(176)}F` : "--"}
                     </span>
                     {data.weather.description ? (
                       <span className="ml-2 capitalize text-zinc-300">{String(data.weather.description)}</span>
@@ -221,34 +223,22 @@ export function PregameInfo() {
   );
 }
 
-type MatchOddsCardProps = {
-  lines: LinesResponse | null;
-  loading: boolean;
-  error: string | null;
-};
-
 function MatchOddsCard({ lines, loading, error }: MatchOddsCardProps) {
   if (loading) {
     return (
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">
-        Loading odds...
-      </div>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">Loading odds...</div>
     );
   }
 
   if (error) {
     return (
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">
-        {error}
-      </div>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">{error}</div>
     );
   }
 
   if (!lines || lines.bookCount === 0) {
     return (
-      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">
-        Vegas lines unavailable.
-      </div>
+      <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">Vegas lines unavailable.</div>
     );
   }
 
@@ -283,10 +273,7 @@ function MatchOddsCard({ lines, loading, error }: MatchOddsCardProps) {
       ) : null}
       <div className="mt-2 flex flex-wrap gap-1 text-[11px] text-zinc-400">
         {lines.lines.slice(0, 6).map((book) => (
-          <div
-            key={`${book.provider}-${book.lastUpdated ?? "na"}`}
-            className="rounded border border-zinc-800/60 bg-zinc-900 px-2 py-1"
-          >
+          <div key={`${book.provider}-${book.lastUpdated ?? "na"}`} className="rounded border border-zinc-800/60 bg-zinc-900 px-2 py-1">
             <span className="text-zinc-300">{book.provider}</span>
             {book.spread != null ? <span className="ml-1 text-zinc-400">{formatSpread(book.spread)}</span> : null}
             {book.total != null ? <span className="ml-1 text-zinc-500">/ {formatTotal(book.total)}</span> : null}
@@ -296,8 +283,6 @@ function MatchOddsCard({ lines, loading, error }: MatchOddsCardProps) {
     </div>
   );
 }
-
-type SparklineProps = { values: number[] };
 
 function Sparkline({ values }: SparklineProps) {
   if (!values.length) return null;
