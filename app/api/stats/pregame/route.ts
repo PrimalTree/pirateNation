@@ -9,6 +9,12 @@ import { getForecastForDate, type ForecastResult } from '../../../../lib/weather
 import fs from 'node:fs/promises';
 import path from 'node:path';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic'; // avoid stale Vercel caches while debugging
+export const revalidate = 0;
+
+
+
 type TeamEntry = { name?: string | null; homeAway?: string | null };
 
 type WeatherPayload = {
@@ -91,7 +97,10 @@ export async function GET(req: Request) {
     }
 
     let baseInfo: BaseGameInfo | null = null;
-
+    if (SCORE_PROVIDER === 'cfbd' && !process.env.CFBD_API_KEY) {
+      return NextResponse.json({ error: 'CFBD_API_KEY missing' }, { status: 500 });
+    }
+    
     if (SCORE_PROVIDER === 'cfbd') {
       baseInfo = await buildBaseFromCfbd({ teamName, year });
     } else {
@@ -534,4 +543,5 @@ function deriveOpponentFromName(name: string, override?: string): { opponent: st
   }
   return { opponent: null, isHome: false };
 }
+
 

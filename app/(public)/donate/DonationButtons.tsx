@@ -11,11 +11,21 @@ type LinkDef = {
 
 const NIL_LINKS: LinkDef[] = [
   {
+    label: "Pirate Club",
+    href: "https://ecupirateclub.com/",
+    hint: "Official ECU Pirate Club",
+  },
+  {
     label: "Team Boneyard",
     href: "https://teamboneyard.org/",
     hint: "Primary ECU Football NIL collective",
   },
-  // Add additional NIL links here as needed
+  {
+    label: "Pirate Shop NIL",
+    href: "https://shop.ecupirates.com/ecu-pirates/nil-pick-a-player/",
+    hint: "Pick‑a‑Player NIL at ECU Shop",
+  },
+  // TODO: Add Pirate Shop NIL (awaiting exact URL)
 ];
 
 export function DonationButtons() {
