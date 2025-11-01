@@ -1,6 +1,6 @@
 "use client";
 import { useMemo, useRef, useState } from 'react';
-import stadiumMap from '../data/public/map.json';
+import stadiumMap from '../../data/public/map.json';
 
 export function StadiumMap() {
   try {

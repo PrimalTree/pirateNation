@@ -1,2 +1,2 @@
-export * from '../../../shared/supabase-browser';
+export * from '../../../lib/supabase-browser';
 

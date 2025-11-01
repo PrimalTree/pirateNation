@@ -2,12 +2,12 @@
 import { useEffect, useMemo, useState, useRef } from 'react';
 import { Clock } from 'lucide-react';
 import Link from 'next/link';
-import ClientOnly from '../../components/ClientOnly';
-import { FlagCard } from '../../../components/gameday/FlagVisuals';
+import ClientOnly from '@components/ClientOnly';
+import { FlagCard } from '@components/gameday/FlagVisuals';
 import scheduleData from '../../../data/public/schedule.json';
-import { shortTeam, shortMatchup, shortFinalString } from '../../../components/gameday/teamName';
-import { StadiumMap } from '../../../components/StadiumMap';
-import { PregameInfo } from '../../../components/gameday/PregameInfo';
+import { shortTeam, shortMatchup, shortFinalString } from '@components/gameday/teamName';
+import { StadiumMap } from '@components/StadiumMap';
+import { PregameInfo } from '@components/gameday/PregameInfo';
 import TeamOpponentStats from './_components/TeamOpponentStats';
 
 

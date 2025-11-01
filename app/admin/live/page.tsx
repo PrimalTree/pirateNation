@@ -1,7 +1,7 @@
 import { revalidatePath } from 'next/cache';
 import { createSupabaseServer } from '@shared/supabase-server';
 import { ManualPushButton } from '../components/ManualPushButton';
-import { ScoreSummary } from '@shared/ui/ScoreSummary';
+import { ScoreSummary } from '@components/ui/ScoreSummary';
 
 async function getLiveRows() {
   const supabase = await createSupabaseServer();
