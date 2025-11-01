@@ -37,3 +37,48 @@ Notes
 
 - Networking is mocked; swap `MockLiveScoreProvider` with a real provider.
 - The queue is in-memory; for production, replace with Redis/SQS and a proper worker.
+
+Frontend App Structure (Next.js)
+
+- `app/` — Next.js App Router pages and layouts.
+- `app/components/` — All shared UI components (migrated from root `components/`).
+- `app/components/gameday/` — Gameday UI (kept).
+- `app/components/engage/` — Engage components kept for re‑integration (not currently wired into pages).
+- `app/components/ui/ScoreSummary.tsx` — UI summary used by admin live page (migrated from `shared/ui`).
+- `lib/` — Shared runtime utilities (migrated from `shared/`).
+  - `lib/supabase-browser.ts`
+  - `lib/supabase-server.ts`
+- `public/branding/` — Brand assets (root `Branding/` folder removed).
+
+Path Aliases
+
+- `@components/*` → `app/components/*`
+- `@shared/*` → `lib/*` (use for shared utilities)
+- `@lib/*` → `lib/*`
+
+Notable Moves
+
+- Moved root `components/*` → `app/components/*` and updated imports.
+- Moved `shared/supabase-*.ts` → `lib/` and updated imports.
+- Moved `shared/ui/ScoreSummary.tsx` → `app/components/ui/ScoreSummary.tsx`.
+- Removed root `Branding/` (assets live under `public/branding/`).
+
+Supabase Helpers
+
+- Browser: `import { createSupabaseBrowser } from '@shared/supabase-browser'` (alias now points to `lib/`).
+- Server: `import { createSupabaseServer } from '@shared/supabase-server'`.
+
+TypeScript
+
+- Validate type state: `npx tsc -p tsconfig.json --noEmit`
+
+Developing the Frontend
+
+- Ensure environment vars are set for Supabase and any external APIs used by components:
+  - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+  - `SUPABASE_URL`, `SUPABASE_ANON_KEY` (server)
+  - Optional: `NEXT_PUBLIC_MAPBOX_TOKEN` (map image overlay in `StadiumMap`)
+
+Engage Components
+
+- `app/components/engage/*` are intentionally preserved for future use. They are currently not imported into pages; integrate as needed and imports will resolve via `@components/engage/...`.

@@ -2,7 +2,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { PirateShip } from '../../../components/gameday/FlagVisuals';
+import { PirateShip } from '@components/gameday/FlagVisuals';
 
 export default function FlagPage() {
   const router = useRouter();
@@ -34,4 +34,3 @@ export default function FlagPage() {
     </div>
   );
 }
-
